@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+<channel>
+   
+      <title>airfer.github.io/</title>
+   
+   <link>http://airfer.github.io/</link>
+   <description>There are some things in this world will never change and some things do change,everything that has a beginning has an end </description>
+   <language>en-uk</language>
+   <managingEditor> Wang Yukun</managingEditor>
+   <atom:link href="rss" rel="self" type="application/rss+xml" />
+   
+	<item>
+	  <title>广告平台系统架构实现</title>
+	  <link>//ads-platform</link>
+	  <author>Wang Yukun</author>
+	  <pubDate>2016-03-30T15:18:00+00:00</pubDate>
+	  <guid>//ads-platform</guid>
+	  <description><![CDATA[
+	     <h4>前言</h4>
+
+<p>广告系统的架构及其复杂，设计的模块多，逻辑广，业务理解难度大，上手的时间较慢，此次整理算是对之前广告业务的梳理，并总结这一年多来从事广告平台相关测试的感受。</p>
+
+<hr />
+
+<h3 id="section">一、架构图总览</h3>
+<p><img src="\images\ads_plantform.jpg" alt="" title="广告平台总体架构图" /></p>
+
+<h3 id="section-1">二、消息分模块架构图</h3>
+<p><img src="\images\ads_plantform_message.jpg" alt="" title="消息分模块" /></p>
+
+<h3 id="front">三、Front打点验证及统计计费</h3>
+<p><img src="\images\ads_plantform_front.jpg" alt="" title="Front打点" /></p>
+
+<h3 id="section-2">四、自动化工具</h3>
+<p>1、轻量级日记监控工具  <br />
+<img src="\images\ads_plantform_monitor.jpg" alt="" title="轻量级日志监控工具" /></p>
+
+
+	  ]]></description>
+	</item>
+
+
+</channel>
+</rss>

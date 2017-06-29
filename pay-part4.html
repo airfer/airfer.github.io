@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!-- [[! Document Settings ]] -->
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+    <!-- [[! Page Meta ]] -->
+    <title>支付网关逻辑之网关交易</title>
+    <meta name="description" content="Sometimes Things Happen For A Reason - There are some things in this world will never change and some things do change,everything that has a beginning has an end " />
+
+    <meta name="HandheldFriendly" content="True" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <link rel="shortcut icon" href="/assets/images/favicon.ico" >
+
+    <!-- [[! Styles'n'Scripts ]] -->
+    <link rel="stylesheet" type="text/css" href="/assets/css/screen.css" />
+    <link rel="stylesheet" type="text/css"
+          href="//fonts.googleapis.com/css?family=Merriweather:300,700,700italic,300italic|Open+Sans:700,400" />
+    <link rel="stylesheet" type="text/css" href="/assets/css/syntax.css" />
+
+    <!-- [[! highlight.js ]] -->
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.3.0/styles/default.min.css">
+    <style>.hljs { background: none; }</style>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.3.0/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+
+    <!-- [[! Ghost outputs important style and meta data with this tag ]] -->
+        <link rel="canonical" href="/" />
+    <meta name="referrer" content="origin" />
+    <link rel="next" href="/page2/" />
+
+    <meta property="og:site_name" content="Sometimes Things Happen For A Reason" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Sometimes Things Happen For A Reason" />
+    <meta property="og:description" content="There are some things in this world will never change and some things do change,everything that has a beginning has an end " />
+    <meta property="og:url" content="/" />
+    <meta property="og:image" content="/assets/images/cover1.jpg" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Sometimes Things Happen For A Reason" />
+    <meta name="twitter:description" content="There are some things in this world will never change and some things do change,everything that has a beginning has an end " />
+    <meta name="twitter:url" content="/" />
+    <meta name="twitter:image:src" content="/assets/images/cover1.jpg" />
+
+    <script type="application/ld+json">
+{
+    "@context": "http://schema.org",
+    "@type": "Website",
+    "publisher": "Finding The Way Home",
+    "url": "/",
+    "image": "/assets/images/cover1.jpg",
+    "description": "There are some things in this world will never change and some things do change,everything that has a beginning has an end "
+}
+    </script>
+
+    <meta name="generator" content="Jekyll 3.0.0" />
+    <link rel="alternate" type="application/rss+xml" title="Sometimes Things Happen For A Reason" href="/feed.xml" />
+
+
+</head>
+<body class="home-template nav-closed">
+
+    <div class="nav">
+    <h3 class="nav-title">Menu</h3>
+    <a href="#" class="nav-close">
+        <span class="hidden">Close</span>
+    </a>
+    <ul>
+        <li class="nav-home " role="presentation"><a href="/">Home</a></li>
+        <li class="nav-about " role="presentation"><a href="/about">About</a></li>
+        <li class="nav-Monitor " role="presentation"><a href="/tag/monitor">Monitor</a></li>
+        <li class="nav-docker " role="presentation"><a href="/tag/docker">Docker</a></li>
+        <li class="nav-unittest " role="presentation"><a href="/tag/unittest">Unittest</a></li>
+        <li class="nav-unittest  nav-current" role="presentation"><a href="/tag/pay">Pay</a></li>
+        <li class="nav-author " role="presentation"><a href="/author/casper">Author</a></li>
+    </ul>
+    <a class="subscribe-button icon-feed" href="/feed.xml">Subscribe</a>
+</div>
+<span class="nav-cover"></span>
+
+
+    <div class="site-wrapper">
+
+        <!-- [[! Everything else gets inserted here ]] -->
+        <!-- < default -->
+
+<!-- The comment above "< default" means - insert everything in this file into -->
+    <!-- the [body] of the default.hbs template, which contains our header/footer. -->
+
+<!-- Everything inside the #post tags pulls data from the post -->
+<!-- #post -->
+
+<header class="main-header post-head " style="background-image: url(/assets/images/new-pic-11.jpg) ">
+    <nav class="main-nav  overlay  clearfix">
+        <a class="blog-logo" href="/"><img src="/assets/images/ghost.png" alt="Blog Logo" /></a>
+        
+            <a class="menu-button icon-menu" href="#"><span class="word">Menu</span></a>
+        
+    </nav>
+</header>
+
+<main class="content" role="main">
+
+    <article class="post tag-test tag-content">
+
+        <header class="post-header">
+            <h1 class="post-title">支付网关逻辑之网关交易</h1>
+            <section class="post-meta">
+            <!-- <a href='/'>Wang Yukun</a> -->
+            <time class="post-date" datetime="2015-10-09">09 Oct 2015</time>
+                <!-- [[tags prefix=" on "]] -->
+                 
+                on 
+                
+                    
+                       <a href='/tag/pay'>Pay</a>
+                       
+                
+                
+            </section>
+        </header>
+
+        <section class="post-content">
+            
+            <h5>前言</h5>
+
+<p>支付底层服务最难的部分便是根据不同的支付场景进行各种复杂的逻辑记账。不同场景的逻辑记账搞清楚了，那么
+整个的底层服务也就清晰明了。这个部分上手也是最难的，常用的方法就是根据底层服务的日志信息进行分析，得到
+数据库操作的流程信息，结合这些日志信息以及业务逻辑基础，便可得到支付场景的记账逻辑。</p>
+
+<hr />
+
+<h3 id="section">一、普通的网关交易</h3>
+<p>普通的网关交易，在之前也做过简述。其主要包括两个部分，分别为网关交易注册，类似于购物下单以及网关交易更新，对应用户支付完成
+后的操作，现就两种进行分析。</p>
+
+<p>1、网关注册</p>
+
+<p><img src="\images\gateway_register.jpg" alt="" title="网关注册图" /></p>
+
+<p>在网关注册服务中会调起两个服务，分别为<em>GatewayService</em>以及<em>TransService</em>：</p>
+
+<p><strong>（1） GatewayService</strong> ：</p>
+
+<ul>
+  <li>从数据库表中根据<em>user_id</em>来查询<em>user_id</em>所对应的账户<em>id</em></li>
+  <li>查询<em>g_trans_log</em>网关交易流水表，判断此笔订单是否已经进行了注册</li>
+  <li>如果此笔订单没有进行注册，则调起<em>TransService</em>进行交易注册</li>
+  <li>交易注册完成后，在<em>g_trans_log</em>网关交易流水表中，进行注册</li>
+  <li>注册完成后，将结果返回给前端</li>
+</ul>
+
+<p><strong>（2） TransService</strong> ：</p>
+
+<ul>
+  <li>查询用户账户<em>id</em>以及商户账户<em>id</em>是否可用</li>
+  <li>如果两者账户id可用，则在日常交易表<em>t_trans</em>中进行登记</li>
+  <li>同时在日常交易流水表<em>t_trans_log</em>中进行登记</li>
+  <li>最后在收款单<em>t_receivables</em>中进行注册</li>
+</ul>
+
+<p>2、网关更新</p>
+
+<p><img src="\images\gateway_update.jpg" alt="" title="网关更新图" /></p>
+
+
+
+        </section>
+
+        <footer class="post-footer">
+
+            <!-- Everything inside the #author tags pulls data from the author -->
+            <!-- #author-->
+
+            
+            <figure class="author-image">
+                <a class="img" href="/author/neo" style="background-image: url(/assets/images/casper.png)"><span class="hidden">'s Picture</span></a>
+            </figure>
+            
+
+            <section class="author">
+                <h4><a href="/author/neo">Wang Yukun</a></h4>
+                
+                
+                    <p> Looking up to the Starry Sky && Keep both feet firmly on the ground</p>
+                
+                <div class="author-meta">
+                    <span class="author-location icon-location"> Beijing, China</span> 
+                    <span class="author-link icon-link"><a href="http://airfer.github.io/"> airfer.github.io/</a></span> 
+                </div>
+            </section>
+
+            <!-- /author  -->
+
+            <section class="share">
+                <h4>Share this post</h4>
+                <a class="icon-twitter" href="http://twitter.com/share?text=支付网关逻辑之网关交易&amp;url=http://airfer.github.io/pay-part4"
+                    onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+                    <span class="hidden">Twitter</span>
+                </a>
+                <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=http://airfer.github.io/pay-part4"
+                    onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+                    <span class="hidden">Facebook</span>
+                </a>
+                <a class="icon-google-plus" href="https://plus.google.com/share?url=http://airfer.github.io/pay-part4"
+                   onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+                    <span class="hidden">Google+</span>
+                </a>
+            </section>
+            
+            <!-- Add Disqus Comments -->
+            
+            
+        </footer>
+
+    </article>
+
+</main>
+
+<aside class="read-next">
+
+    <!-- [[! next_post ]] -->
+    
+        <a class="read-next-story " style="background-image: url(/assets/images/new-pic-7.jpg)" href="/ads-platform">
+            <section class="post">
+                <h2>广告平台系统架构实现</h2>
+                <p>前言 
+
+广告系统的架构及其复杂，设计的模块多，逻辑广，业务理解难度大，上手的时间较慢，此次整理算是对之前广告业务的梳理，并总结这一年多来从事广告平台相关测试的感受。     
+
+---
+   
+   
+###一、架构图总览   
+!...</p>
+            </section>
+        </a>
+    
+    <!-- [[! /next_post ]] -->
+    <!-- [[! prev_post ]] -->
+    
+        <a class="read-next-story prev " style="background-image: url(/assets/images/new-pic-6.jpg)" href="/begin-to-know-pay-service">
+            <section class="post">
+                <h2>支付业务入门及实践</h2>
+                <p>前言
+
+对于一些比较复杂的业务，其业务逻辑是十分复杂的。如果只是通过口耳相授，很难将复杂的逻辑讲清楚，也很难在短时间内让新人上手。对于一个团队来说，业务逻辑知识以及测试自动化技术的沉淀显得尤为重要。现在就业务入门及相关指导进行梳理。
+...</p>
+            </section>
+        </a>
+    
+    <!-- [[! /prev_post ]] -->
+</aside>
+
+<!-- /post -->
+
+
+        <footer class="site-footer clearfix">
+          <section class="copyright"><a href="/">Sometimes Things Happen For A Reason</a> &copy; 2017</section>
+          <section class="poweredby">Proudly published with <a href="https://jekyllrb.com/">Jekyll</a> using <a href="https://github.com/biomadeira/jasper">Jasper</a></section>
+        </footer>
+    </div>
+    <!-- [[! Ghost outputs important scripts and data with this tag ]] -->
+    <script type="text/javascript" src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+    <!-- [[! The main JavaScript file for Casper ]] -->
+    <script type="text/javascript" src="/assets/js/jquery.fitvids.js"></script>
+    <script type="text/javascript" src="/assets/js/index.js"></script>
+
+    <!-- Add Google Analytics  -->
+        <!-- Google Analytics Tracking code -->
+     <script>
+	    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+	    ga('create', 'UA-69281367-1', 'auto');
+	    ga('send', 'pageview');
+
+     </script>   
+</body>
+</html>

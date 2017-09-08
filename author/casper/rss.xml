@@ -12,6 +12,100 @@
    <atom:link href="rss" rel="self" type="application/rss+xml" />
    
 	<item>
+	  <title>kubernetes在测试中的应用实践</title>
+	  <link>//k8s-practice</link>
+	  <author>Wang Yukun</author>
+	  <pubDate>2017-08-29T19:28:00+00:00</pubDate>
+	  <guid>//k8s-practice</guid>
+	  <description><![CDATA[
+	     <h4>前言</h4>
+<p>在休假之前就想写一写kubernetes在测试中应用的一些事，后来因为各种原因被耽搁了下来。这次趁着休假期间的空闲，把应用方面的东西梳理一下，算做是对之前一段研究东西的总结。</p>
+
+<p>研究kubernetes也有一段时间了，在测试方面的应用我将其归类为三个方面：分别为服务部署、环境搭建、持续集成优化 。其实每个方面都值得写一篇文章进行详细阐述，只是最近变的有些懒，就写个总的概况吧。对这个方向感兴趣的同仁欢迎拍砖，也欢迎大家留言探讨，正餐现在开始。</p>
+
+<h4>服务部署</h4>
+<p>服务部署作为k8s最主要的核心功能，在实践中被广泛应用是一件很正常的事情。其实这里讲的服务部署，主要是测试服务的部署，当然这和其他服务的部署没有本质的区别。这样做的目的是充分利用k8s集群的特性为我们服务，保证我们测试服务稳定且高效。目前我们的k8s集群上部署了两个服务，一个是jenkins，一个是镜像生成服务takara。就以takara为例来举例说明吧。</p>
+
+<p>首先介绍一下takara，takara服务是根据用户提供的dockerfile文件生成image镜像，并将镜像推送到本地私有registry，成功后返回生成的镜像信息供后续部署使用。其工作原理如下图所示：
+<img src="/images/k8s/takara.jpg" alt="" /></p>
+
+<p>takara作为基础服务存在，如果其出现问题将影响后续所有的部署、构建过程，所以其必须稳定。后续由于多个业务线会使用该服务，为了高效快速的生成镜像减少排队情况的发生，Image 生成器会有多个。</p>
+
+<p>从图中可以看出，HttpServer接受get/post的请求，请求的信息中包含dockerfile的地址信息、所需的依赖文件信息等。关于所依赖的物料数据来源有多种方式，例如使用rsync工具，或者直接从hadoop上获取。HttpServer的作用在于解析请求数据，并将解析后的数据写入任务调度队列，供后续worker使用。</p>
+
+<p>由于worker生产镜像的过程是无状态的，所以可以通过kubernetes的replica set动态调整worker的数目。每一个worker位于一个pod中，由两个container组成，分别为Prepare container和Generate container。</p>
+
+<p>前者用于docker build之前的准备工作，主要是获取dockerfile文件，以及相关的依赖文件，并将获得的文件数据进行持久化存储。当前持久化存储使用的是nfs，目前在测试环境下支持良好，速度较快。后者用于根据获取的dockerfile文件数据，生成image镜像，并将镜像重新命名，打tag后推送到私有的镜像仓库，供后续使用。</p>
+
+<p>由于httpserver的上层是kubernetes的service，所以即使一个httpserver挂掉，也不会影响整体的运行。httpserver的数量以及worker的数量都通过replica set进行控制。可以发现，使用kubernetes进行服务部署的好处在于服务的稳定高效，无状态扩展简单。并不是所有的服务都适合在kubernetes上部署，具体情况需要具体分析。
+环境搭建
+在测试过程中，环境搭建是一个比较头疼的事情，各种操作系统的版本，各种依赖库，每一次搭建都要重复一遍这个痛苦的过程。那么有没有一种方法可以一劳永逸呢？其实答案就是镜像。我们将各种操作系统的版本以及服务运行所依赖的lib库生成一个镜像，然后将镜像上传到我们的私有registry，每次在使用的时候直接从registry中拖取就可以了。</p>
+
+<p>这样看来是非常简单的事情，那么这和kubernetes有什么关系呢?我们安装docker直接pull不可以吗？其实在实际应用中会发现遇到的问题比刚开始所想的要多的多。那么考虑下面几个方面：
+- 如果开发同学想要一个环境，但是没有空闲的机器
+- 如果你在本地环境发现某问题，如何让开发快速的定位修复
+- 如何和同组的其他同学分享你的测试环境
+- 当测试环境很多时，如何有效的管理这些环境
+- 当测试环境由于一些因素挂掉时，如何保证稳定可用</p>
+
+<p>通过上述的问题，我们发现要满足上面的几个方面，需要保证以下几点：
+- 非初次环境的部署要快速，不能部署一个环境需要半天甚至更长的时间
+- 环境需要有独立的ip，可以通过ssh访问，便于开发定位问题
+- 当环境很多时，需要有一个列表或者table列出环境与ip的对应关系，方便查找
+- 当环境因某些原因挂掉时，可以自行重启恢复，重启后数据不丢失
+目前部门内部试用的环境部署方案如下图所示：
+<img src="/images/k8s/ssh.jpg" alt="" /></p>
+
+<p>从图中可以看出，整体的结构比较简单，其实环境部署的重点在于镜像制作。用户通过ssh登录到中控机，然后在中控机上通过ssh免密码登录所需服务。但是这里需要对以下几点进行说明：
+- 由于集群内部中pod的ip为weave overlay网段私有ip地址，所以在公司内网中是无法直接访问。为了解决这个问题，一种方式是将镜像中的sshd服务通过service开放出来，这样通过访问service可以访问sshd服务，但是这种方式存在一些问题，比如在内网中存在external ip无法获取的情况
+- 另一种方式，将kubernetes集群中的一个node作为中控节点，通过在中控节点访问kubernetes内部的pod，目前部门内部采用的是这种方式。这种方式相比第一种方法，比较简单不需要配置service，同时也起到了一定的安全保护作用（只可从中控机访问）
+- 每个需要启动的环境镜像，都包含了中控机的ssh公钥信息，这样可以做到免密码登录
+- 至于查看环境与ip的对应关系，通过kubernetes的dashboard或者在master节点上查看都可以，不过推荐dashboard</p>
+
+<h4>持续集成优化</h4>
+<p>持续集成一直是测试关注的重点，在持续集成的实践中，我们也碰到了一些问题。比如，我们需要选择具体在某个jenkins slave node中执行我们的程序，由于程序的执行对操作系统以及相关的依赖库都有要求，所以在运行jenkins任务之前，我们必须保证slave节点已经配置了任务要求所有的要素。</p>
+
+<p>每新增一个slave节点，上述的环境配置都需要重新配置，很耗费时间。同时如果我们的slave节点挂掉了，我们需要去重新启动这个节点；如果这个节点已经下线，那么就需要重新申请一个节点，或者将该任务的执行节点重新迁移到新的节点。</p>
+
+<p>当任务不多，并且节点变动不是很频繁时，这个需求并不是很强烈。但是当支持的业务线众多，各服务依赖的操作系统以及相关库差异性很大时，基于容器的持续集成就变得优势巨大。每个业务线都可以根据自己的需求定制自己的镜像，持续部署时依赖自己的镜像就可以了。</p>
+
+<p>举个例子，假设有5台slave机子都安装了某依赖库，后来由于服务升级，该依赖库也需要进行升级。如果按照传统的方法，需要分别到这5台机子上进行升级，而如果使用镜像，只需要重新生成镜像即可。</p>
+
+<p>使用kubernetes集群进行持续集成最大的优点就是解决了环境依赖问题，最终这个任务究竟在哪个node，哪个pod中运行，根本无需担心。目前基于kubernetes集群的持续集成有两个方式：
+一种是直接在master节点上按照pipeline的stage执行程序，程序直接在master节点上执行，和服务部署相同，程序运行结束，pod就终止被删除。
+另一种方式，是利用jenkins的kubernetes插件，关于其使用说明github中的文档已经写的很清楚了，就不再赘述了。</p>
+
+<p>关于pipeline的使用并不是本篇讨论的重点，后续@宋大神会专门写一篇文章介绍。</p>
+
+<p>这里以目前的竞价服务的pipeline进行简要的说明。对于竞价服务，和其他服务一样，我们需要一个完整的持续集成体系。在这个持续集成的pipeline中，包含代码静态检测、分布式功能性测试、增量式性能测、手工功能性测试，示意图如下所示：
+<img src="/images/k8s/pipeline.jpg" alt="" /></p>
+
+<p>从图中可以看到代码的静态检测用的cpplint以及infer，后续会写一个这两个工具的对比分析；分布式功能性测试除了完成全部的自动化case回归之外，还包括代码的覆盖率统计，用的是gcov；增量式压测用的是部门内部已存在的压测工具端；手工功能测试，使用第二部分的环境进行测试即可。</p>
+
+<p>这里重点说一下增量式压测，压测的目的是检查程序运行的稳定性以及是否存在内存泄露等问题。目前的压测环境用的线上拷贝的全量数据，而压测端用的是从线上截取的部分数据，比如从线上截取20000条。这样就存在一个问题，由于压测端的数据并不具有特异性，无法重点覆盖新增加的功能。考虑一种极端的情况，使用的这20000条数据，得到是同样的样式数据，这样就无法做到覆盖尽可能多的分支。</p>
+
+<p>而分布式回归测试中，自动化case都是具有特异性的，就是为了验证某项功能，那么可不可以将分布式回归的case经过一些修改用于增量式压测呢？其实这个方案是可行的，在休假之前，我已经在物料库测试中进行了验证。假设在物料库服务中的新增代码中存在内存泄露，那么某个自动化case恰好覆盖这个代码分支，那么反复运行该case，内存泄露的情况从kubernetes的node节点中是可以明显查看到的。</p>
+
+<p>由于heapster以及grafana的存在，使得监控pod以及报警变得更加简单，关于其实现机制有兴趣的同学可以去github中查看，下面的例子是当时测试过程中的截图，如下所示：</p>
+
+<p><img src="/images/k8s/material1.jpg" alt="" />
+图一</p>
+
+<p><img src="/images/k8s/material2.jpg" alt="" />
+图二
+其实并不是需要运行几个小时甚至一天才能查看到内存是否泄漏，从上面的两个图可以看到即使很短的时间，或许只要几分钟我们也可以看到内存持续增长的趋势。</p>
+
+<h4>后记</h4>
+<p>这篇的内容其实是对之前我所做工作的一个梳理，虽然休假之前就想写一写，但是感到头疼，因为涉及的点太多，感觉无从下手。本篇也只是写了一个概览，有很多细节并未提及，希望本篇能给还在这条路上探索的同学一点启发。</p>
+
+<p>很多时候我一直在想提高测试生产力的方法，其实到最后可归为两类，一类是测试技术能力的提升，比如本篇所提及的；另一类则是测试策略。之前写过一些总结类的文章，基本都会涵盖一些测试策略、测试方法。测试的策略与方法并非一成不变的，好的测试工程师应该可以根据业务的需求，定制合适的测试方案。</p>
+
+<p>本篇就到这吧，最后欢迎关注我们的微信公众号，铸盾师~~</p>
+
+	  ]]></description>
+	</item>
+
+	<item>
 	  <title>基于Ansible && Docker的分布式系统(下)</title>
 	  <link>//ansible-docker-2</link>
 	  <author>Wang Yukun</author>
@@ -1501,466 +1595,6 @@ docker引擎的1.2.1版本集成了新的swarm，所以如果有可能还是使�
 
 <p><strong>后记：</strong>
 	单元测试的内容还是太多，我也就算刚入门，需要学习的东西还有很多，上面算是初做单元测试的感悟吧，希望对有需要的同学有所帮助，同时也欢迎c++单元测试高手交流经验~</p>
-
-
-	  ]]></description>
-	</item>
-
-	<item>
-	  <title>基于 Gtest 的单元测试入门及实践 (一)</title>
-	  <link>//gtest-unittest-1</link>
-	  <author>Wang Yukun</author>
-	  <pubDate>2016-08-11T10:18:00+00:00</pubDate>
-	  <guid>//gtest-unittest-1</guid>
-	  <description><![CDATA[
-	     <h5>前言:</h5>
-<p>其实这并不是关于Gtest学习入门的资料，我希望读者在读这篇文件之前还是要对Googletest的单元测试框架有所了解。为了让读者比较容易理解gtest的后续实践，本系列文章分成前后两个部分，前半部分主要以gtest 所自带的samples(<a href="https://github.com/google/googletest/tree/master/googletest/samples">samples in github</a>)为例，讲述一下gtest的基本用法。后半部分主要在实际应用中的gtest的用法，以及一些测试感悟，希望不要让大家失望。</p>
-
-<hr />
-
-<h5>一、初级</h5>
-
-<ul>
-  <li>例一
-主要来讲述普通函数的单元测试，主要包含3个文件，分别为sample1.h, sample1.cc , sample1_unittest.cc</li>
-</ul>
-
-<figure class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span class="cm">/*sample1.h*/</span>
-<span class="cp">#ifndef GTEST_SAMPLES_SAMPLE1_H_
-#define GTEST_SAMPLES_SAMPLE1_H_
-</span>
-<span class="c1">// Returns n! (the factorial of n).  For negative n, n! is defined to be 1.
-// 求N的阶乘
-</span><span class="kt">int</span> <span class="n">Factorial</span><span class="p">(</span><span class="kt">int</span> <span class="n">n</span><span class="p">);</span>
-
-<span class="c1">// Returns true iff n is a prime number.
-// 判断一个数是否为质数
-</span><span class="n">bool</span> <span class="n">IsPrime</span><span class="p">(</span><span class="kt">int</span> <span class="n">n</span><span class="p">);</span>
-
-<span class="cp">#endif  // GTEST_SAMPLES_SAMPLE1_H_</span></code></pre></figure>
-
-<figure class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span class="cm">/*samples1.cc*/</span>
-<span class="cp">#include "sample1.h"
-</span>
-<span class="c1">// Returns n! (the factorial of n).  For negative n, n! is defined to be 1.
-</span><span class="kt">int</span> <span class="nf">Factorial</span><span class="p">(</span><span class="kt">int</span> <span class="n">n</span><span class="p">)</span> <span class="p">{</span>
-  <span class="kt">int</span> <span class="n">result</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
-  <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;=</span> <span class="n">n</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
-    <span class="n">result</span> <span class="o">*=</span> <span class="n">i</span><span class="p">;</span>
-  <span class="p">}</span>
-
-  <span class="k">return</span> <span class="n">result</span><span class="p">;</span>
-<span class="p">}</span>
-
-<span class="c1">// Returns true iff n is a prime number.
-</span><span class="n">bool</span> <span class="nf">IsPrime</span><span class="p">(</span><span class="kt">int</span> <span class="n">n</span><span class="p">)</span> <span class="p">{</span>
-  <span class="c1">// Trivial case 1: small numbers
-</span>  <span class="k">if</span> <span class="p">(</span><span class="n">n</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">)</span> <span class="k">return</span> <span class="nb">false</span><span class="p">;</span>
-
-  <span class="c1">// Trivial case 2: even numbers
-</span>  <span class="k">if</span> <span class="p">(</span><span class="n">n</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="k">return</span> <span class="n">n</span> <span class="o">==</span> <span class="mi">2</span><span class="p">;</span>
-
-  <span class="c1">// Now, we have that n is odd and n &gt;= 3.
-</span>
-  <span class="c1">// Try to divide n by every odd number i, starting from 3
-</span>  <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">3</span><span class="p">;</span> <span class="p">;</span> <span class="n">i</span> <span class="o">+=</span> <span class="mi">2</span><span class="p">)</span> <span class="p">{</span>
-    <span class="c1">// We only have to try i up to the squre root of n
-</span>    <span class="k">if</span> <span class="p">(</span><span class="n">i</span> <span class="o">&gt;</span> <span class="n">n</span><span class="o">/</span><span class="n">i</span><span class="p">)</span> <span class="k">break</span><span class="p">;</span>
-
-    <span class="c1">// Now, we have i &lt;= n/i &lt; n.
-</span>    <span class="c1">// If n is divisible by i, n is not prime.
-</span>    <span class="k">if</span> <span class="p">(</span><span class="n">n</span> <span class="o">%</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="k">return</span> <span class="nb">false</span><span class="p">;</span>
-  <span class="p">}</span>
-
-  <span class="c1">// n has no integer factor in the range (1, n), and thus is prime.
-</span>  <span class="k">return</span> <span class="nb">true</span><span class="p">;</span>
-<span class="p">}</span></code></pre></figure>
-
-<figure class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span class="cm">/*sample1_unittest.cc*/</span>
-<span class="c1">// This sample shows how to write a simple unit test for a function,
-// using Google C++ testing framework.
-// 这个例子展示了如何使用C++ 单元测试框架对函数进行单元测试
-// Writing a unit test using Google C++ testing framework is easy as 1-2-3:
-// 利用Google C++单元测试框架做单元测试只须简单的三步
-</span>
-<span class="c1">// Step 1. Include necessary header files such that the stuff your
-// test logic needs is declared.
-//
-// 第一步，包含必要的头部文件，确保测试逻辑所需要的头文件已被声明，并且不要忘记
-// gtest.h。
-// Don't forget gtest.h, which declares the testing framework.
-</span>
-<span class="cp">#include &lt;limits.h&gt;
-#include "sample1.h"
-#include "gtest/gtest.h"
-</span>
-
-<span class="c1">// Step 2. Use the TEST macro to define your tests.
-//
-// TEST has two parameters: the test case name and the test name.
-// After using the macro, you should define your test logic between a
-// pair of braces.  You can use a bunch of macros to indicate the
-// success or failure of a test.  EXPECT_TRUE and EXPECT_EQ are
-// examples of such macros.  For a complete list, see gtest.h.
-//
-//第二步，TEST宏有两个参数，分别为测试用例集名称和测试用例名称，在使用这个宏以后，
-//你需要在{}内定义你的测试逻辑。你可以使用一系列的宏来表示测试的成功或着失败。例如
-//EXPECT_TRUE表示期望值正确，EXPECT_EQ表示结果值大于或等于期望值。
-//
-//
-//
-// &lt;TechnicalDetails&gt;
-//
-// In Google Test, tests are grouped into test cases.  This is how we
-// keep test code organized.  You should put logically related tests
-// into the same test case.
-//
-// The test case name and the test name should both be valid C++
-// identifiers.  And you should not use underscore (_) in the names.
-//
-// Google Test guarantees that each test you define is run exactly
-// once, but it makes no guarantee on the order the tests are
-// executed.  Therefore, you should write your tests in such a way
-// that their results don't depend on their order.
-//
-//技术细节：
-//    在Google Test中，测试用例被分成测试用例集，这保证了我们的代码有良好的组织性，所以
-//你应该把逻辑相关的测试用例归集到同一测试用例集当中。
-//
-//测试用例集名称以及测试用例名称必须是C++合法的标识符，并且在名称中不允许使用下划线（_）
-//Google Test测试框架，可以保证所有定义的测试都能够被正确执行，但是对测试执行的顺序比如先执行那些
-//后执行那些并没有保证。所以你编写的测试代码，其测试结果不应该依赖于其执行顺序。
-//
-// &lt;/TechnicalDetails&gt;
-</span>
-
-<span class="c1">// Tests Factorial().
-</span>
-<span class="c1">// Tests factorial of negative numbers.
-// 测试负数的阶乘
-</span><span class="n">TEST</span><span class="p">(</span><span class="n">FactorialTest</span><span class="p">,</span> <span class="n">Negative</span><span class="p">)</span> <span class="p">{</span>
-  <span class="c1">// This test is named "Negative", and belongs to the "FactorialTest"
-</span>  <span class="c1">// 测试用例集的名称是 FactorialTest, 测试用例名称 是 Negative
-</span>  <span class="c1">// test case.
-</span>  <span class="n">EXPECT_EQ</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">Factorial</span><span class="p">(</span><span class="o">-</span><span class="mi">5</span><span class="p">));</span>
-  <span class="n">EXPECT_EQ</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">Factorial</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">));</span>
-  <span class="n">EXPECT_GT</span><span class="p">(</span><span class="n">Factorial</span><span class="p">(</span><span class="o">-</span><span class="mi">10</span><span class="p">),</span> <span class="mi">0</span><span class="p">);</span>
-
-  <span class="c1">// &lt;TechnicalDetails&gt;
-</span>  <span class="c1">//
-</span>  <span class="c1">// EXPECT_EQ(expected, actual) is the same as
-</span>  <span class="c1">//
-</span>  <span class="c1">//   EXPECT_TRUE((expected) == (actual))
-</span>  <span class="c1">//
-</span>  <span class="c1">// except that it will print both the expected value and the actual
-</span>  <span class="c1">// value when the assertion fails.  This is very helpful for
-</span>  <span class="c1">// debugging.  Therefore in this case EXPECT_EQ is preferred.
-</span>  <span class="c1">//
-</span>  <span class="c1">// On the other hand, EXPECT_TRUE accepts any Boolean expression,
-</span>  <span class="c1">// and is thus more general.
-</span>  <span class="c1">//
-</span>  <span class="c1">//技术细节：
-</span>  <span class="c1">//    EXPECT_EQ(expected,actual)与EXPECT_TRUE((expected)==(actual))是等同的，有一点
-</span>  <span class="c1">//不同的是，当EXPECT_EQ(expected,actual)失败时会打印出期望的值与实际的值，这对调试非常有帮助，因此使用EXPECT_EQ更好一些。
-</span>  <span class="c1">//
-</span>  <span class="c1">//但是从另一方面说，由于EXPECT_TRUE可以接受任何类型的布尔表达式，所以应用更广一些
-</span>  <span class="c1">//
-</span>  <span class="c1">// &lt;/TechnicalDetails&gt;
-</span><span class="p">}</span>
-
-<span class="c1">// Tests factorial of 0.
-</span><span class="n">TEST</span><span class="p">(</span><span class="n">FactorialTest</span><span class="p">,</span> <span class="n">Zero</span><span class="p">)</span> <span class="p">{</span>
-  <span class="n">EXPECT_EQ</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">Factorial</span><span class="p">(</span><span class="mi">0</span><span class="p">));</span>
-<span class="p">}</span>
-
-<span class="c1">// Tests factorial of positive numbers.
-</span><span class="n">TEST</span><span class="p">(</span><span class="n">FactorialTest</span><span class="p">,</span> <span class="n">Positive</span><span class="p">)</span> <span class="p">{</span>
-  <span class="n">EXPECT_EQ</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">Factorial</span><span class="p">(</span><span class="mi">1</span><span class="p">));</span>
-  <span class="n">EXPECT_EQ</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">Factorial</span><span class="p">(</span><span class="mi">2</span><span class="p">));</span>
-  <span class="n">EXPECT_EQ</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="n">Factorial</span><span class="p">(</span><span class="mi">3</span><span class="p">));</span>
-  <span class="n">EXPECT_EQ</span><span class="p">(</span><span class="mi">40320</span><span class="p">,</span> <span class="n">Factorial</span><span class="p">(</span><span class="mi">8</span><span class="p">));</span>
-<span class="p">}</span>
-
-
-<span class="c1">// Tests IsPrime()
-</span>
-<span class="c1">// Tests negative input.
-</span><span class="n">TEST</span><span class="p">(</span><span class="n">IsPrimeTest</span><span class="p">,</span> <span class="n">Negative</span><span class="p">)</span> <span class="p">{</span>
-  <span class="c1">// This test belongs to the IsPrimeTest test case.
-</span>
-  <span class="n">EXPECT_FALSE</span><span class="p">(</span><span class="n">IsPrime</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">));</span>
-  <span class="n">EXPECT_FALSE</span><span class="p">(</span><span class="n">IsPrime</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">));</span>
-  <span class="n">EXPECT_FALSE</span><span class="p">(</span><span class="n">IsPrime</span><span class="p">(</span><span class="n">INT_MIN</span><span class="p">));</span>
-<span class="p">}</span>
-
-<span class="c1">// Tests some trivial cases.
-</span><span class="n">TEST</span><span class="p">(</span><span class="n">IsPrimeTest</span><span class="p">,</span> <span class="n">Trivial</span><span class="p">)</span> <span class="p">{</span>
-  <span class="n">EXPECT_FALSE</span><span class="p">(</span><span class="n">IsPrime</span><span class="p">(</span><span class="mi">0</span><span class="p">));</span>
-  <span class="n">EXPECT_FALSE</span><span class="p">(</span><span class="n">IsPrime</span><span class="p">(</span><span class="mi">1</span><span class="p">));</span>
-  <span class="n">EXPECT_TRUE</span><span class="p">(</span><span class="n">IsPrime</span><span class="p">(</span><span class="mi">2</span><span class="p">));</span>
-  <span class="n">EXPECT_TRUE</span><span class="p">(</span><span class="n">IsPrime</span><span class="p">(</span><span class="mi">3</span><span class="p">));</span>
-<span class="p">}</span>
-
-<span class="c1">// Tests positive input.
-</span><span class="n">TEST</span><span class="p">(</span><span class="n">IsPrimeTest</span><span class="p">,</span> <span class="n">Positive</span><span class="p">)</span> <span class="p">{</span>
-  <span class="n">EXPECT_FALSE</span><span class="p">(</span><span class="n">IsPrime</span><span class="p">(</span><span class="mi">4</span><span class="p">));</span>
-  <span class="n">EXPECT_TRUE</span><span class="p">(</span><span class="n">IsPrime</span><span class="p">(</span><span class="mi">5</span><span class="p">));</span>
-  <span class="n">EXPECT_FALSE</span><span class="p">(</span><span class="n">IsPrime</span><span class="p">(</span><span class="mi">6</span><span class="p">));</span>
-  <span class="n">EXPECT_TRUE</span><span class="p">(</span><span class="n">IsPrime</span><span class="p">(</span><span class="mi">23</span><span class="p">));</span>
-<span class="p">}</span>
-
-<span class="c1">// Step 3. Call RUN_ALL_TESTS() in main().
-//
-// We do this by linking in src/gtest_main.cc file, which consists of
-// a main() function which calls RUN_ALL_TESTS() for us.
-//
-// This runs all the tests you've defined, prints the result, and
-// returns 0 if successful, or 1 otherwise.
-//
-// Did you notice that we didn't register the tests?  The
-// RUN_ALL_TESTS() macro magically knows about all the tests we
-// defined.  Isn't this convenient?
-//
-// 第三步，我们在编译的时候会链接src/gtest_main.cc 文件，这个文件包含了
-// main()函数，在main()函数里调用RUN_ALL_TESTS(), 而此函数会调用我们所定义
-// 的所有TEST（）函数，并打印运行结果，返回值为0表示成功，为1表示失败。
-//
-// 由于我们不许要注册这些测试，RUN_ALL_TESTS()就全部替我们做好，所以此框架
-</span><span class="o">//</span> <span class="err">使用起来非常的方便。</span></code></pre></figure>
-
-<p>例一中主要阐述了如何根据gtest来编写一个简单的单元测试。关于一些注意事项在技术细节中已经阐述清楚，这样看来单元测试不难吧^^。有一点需要多注意一些，在上文中也提到了，测试用例集与测试用例的关系，在实际测试中，尽量将相关的测试用例放在一个测试用例集里面，这样方便管理，如果出现问题，定位以及调试问题都比较方便。</p>
-
-<p>可以看到，我们本例子，我们并没有添加main函数，在第三步的论述中也阐明了原因。但是如果我们的程序中存在main函数，那么在链接的时候就不要去链接gest_main.cc文件，否则会报错.</p>
-
-<figure class="highlight"><pre><code class="language-powershell" data-lang="powershell"><span class="c1">#makefile文件部分</span>
-gtest-all.o : <span class="k">$(</span>GTEST_SRCS_<span class="k">)</span>
-	<span class="k">$(</span>CXX<span class="k">)</span> <span class="k">$(</span>CPPFLAGS<span class="k">)</span> -I<span class="k">$(</span>GTEST_DIR<span class="k">)</span> <span class="k">$(</span>CXXFLAGS<span class="k">)</span> -c <span class="se">\</span>
-            <span class="k">$(</span>GTEST_DIR<span class="k">)</span>/src/gtest-all.cc
-
-gtest_main.o : <span class="k">$(</span>GTEST_SRCS_<span class="k">)</span>
-	<span class="k">$(</span>CXX<span class="k">)</span> <span class="k">$(</span>CPPFLAGS<span class="k">)</span> -I<span class="k">$(</span>GTEST_DIR<span class="k">)</span> <span class="k">$(</span>CXXFLAGS<span class="k">)</span> -c <span class="se">\</span>
-            <span class="k">$(</span>GTEST_DIR<span class="k">)</span>/src/gtest_main.cc
-
-gtest.a : gtest-all.o
-	<span class="k">$(</span>AR<span class="k">)</span> <span class="k">$(</span>ARFLAGS<span class="k">)</span> <span class="nv">$@</span> <span class="nv">$^</span>
-
-gtest_main.a : gtest-all.o gtest_main.o
-	<span class="k">$(</span>AR<span class="k">)</span> <span class="k">$(</span>ARFLAGS<span class="k">)</span> <span class="nv">$@</span> <span class="nv">$^</span>
-
-<span class="c1"># Builds a sample test.  A test should link with either gtest.a or</span>
-<span class="c1"># gtest_main.a, depending on whether it defines its own main()</span>
-<span class="c1"># function.</span>
-
-sample1.o : <span class="k">$(</span>USER_DIR<span class="k">)</span>/sample1.cc <span class="k">$(</span>USER_DIR<span class="k">)</span>/sample1.h <span class="k">$(</span>GTEST_HEADERS<span class="k">)</span>
-	<span class="k">$(</span>CXX<span class="k">)</span> <span class="k">$(</span>CPPFLAGS<span class="k">)</span> <span class="k">$(</span>CXXFLAGS<span class="k">)</span> -c <span class="k">$(</span>USER_DIR<span class="k">)</span>/sample1.cc
-
-sample1_unittest.o : <span class="k">$(</span>USER_DIR<span class="k">)</span>/sample1_unittest.cc <span class="se">\</span>
-                     <span class="k">$(</span>USER_DIR<span class="k">)</span>/sample1.h <span class="k">$(</span>GTEST_HEADERS<span class="k">)</span>
-	<span class="k">$(</span>CXX<span class="k">)</span> <span class="k">$(</span>CPPFLAGS<span class="k">)</span> <span class="k">$(</span>CXXFLAGS<span class="k">)</span> -c <span class="k">$(</span>USER_DIR<span class="k">)</span>/sample1_unittest.cc
-
-sample1_unittest : sample1.o sample1_unittest.o gtest_main.a
-	<span class="k">$(</span>CXX<span class="k">)</span> <span class="k">$(</span>CPPFLAGS<span class="k">)</span> <span class="k">$(</span>CXXFLAGS<span class="k">)</span> -lpthread <span class="nv">$^</span> -o <span class="nv">$@</span></code></pre></figure>
-
-<p>从上述makefile文件的最后看到，在链接生成sample1_unittest可执行文件的时候，链接的是gtest_main.a的静态链接库。如果我们的自定义程序中包含main函数，那么这个地方就需要链接gtest.a的静态链接库。</p>
-
-<p>make之后运行的结果下图所示:
-<img src="/images/unittest/1.png" alt="" /></p>
-
-<ul>
-  <li>例2 主要来讲述类中的成员函数如何进行单元测试，也包含3个文件，分别为sample2.h, sample2.cc , sample2_unittest.cc</li>
-</ul>
-
-<figure class="highlight"><pre><code class="language-cpp" data-lang="cpp"><span class="cm">/*sample2.h*/</span>
-<span class="cp">#ifndef GTEST_SAMPLES_SAMPLE2_H_
-#define GTEST_SAMPLES_SAMPLE2_H_
-</span>
-<span class="cp">#include &lt;string.h&gt;
-</span>
-
-<span class="c1">// A simple string class.
-// 简单的字符串类
-</span><span class="k">class</span> <span class="nc">MyString</span> <span class="p">{</span>
- <span class="k">private</span><span class="o">:</span>
-  <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">c_string_</span><span class="p">;</span>
-  <span class="c1">//复制操作符被禁用
-</span>  <span class="k">const</span> <span class="n">MyString</span><span class="o">&amp;</span> <span class="k">operator</span><span class="o">=</span><span class="p">(</span><span class="k">const</span> <span class="n">MyString</span><span class="o">&amp;</span> <span class="n">rhs</span><span class="p">);</span>
-
- <span class="k">public</span><span class="o">:</span>
-  <span class="c1">// Clones a 0-terminated C string, allocating memory using new.
-</span>  <span class="c1">// 克隆一个以'\0'结尾的字符串，并分配内存
-</span>  <span class="k">static</span> <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">CloneCString</span><span class="p">(</span><span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">a_c_string</span><span class="p">);</span>
-
-  <span class="c1">////////////////////////////////////////////////////////////
-</span>  <span class="c1">//
-</span>  <span class="c1">// C'tors
-</span>
-  <span class="c1">// The default c'tor constructs a NULL string.
-</span>  <span class="c1">// 默认构造函数
-</span>  <span class="n">MyString</span><span class="p">()</span> <span class="o">:</span> <span class="n">c_string_</span><span class="p">(</span><span class="nb">NULL</span><span class="p">)</span> <span class="p">{}</span>
-
-  <span class="c1">// Constructs a MyString by cloning a 0-terminated C string.
-</span>  <span class="c1">// 通过clone一个以‘\0’结尾的字符串来构建MyString
-</span>  <span class="k">explicit</span> <span class="n">MyString</span><span class="p">(</span><span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">a_c_string</span><span class="p">)</span> <span class="o">:</span> <span class="n">c_string_</span><span class="p">(</span><span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
-    <span class="n">Set</span><span class="p">(</span><span class="n">a_c_string</span><span class="p">);</span>
-  <span class="p">}</span>
-
-  <span class="c1">// Copy c'tor
-</span>  <span class="c1">// 拷贝构造函数
-</span>  <span class="n">MyString</span><span class="p">(</span><span class="k">const</span> <span class="n">MyString</span><span class="o">&amp;</span> <span class="n">string</span><span class="p">)</span> <span class="o">:</span> <span class="n">c_string_</span><span class="p">(</span><span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
-    <span class="n">Set</span><span class="p">(</span><span class="n">string</span><span class="p">.</span><span class="n">c_string_</span><span class="p">);</span>
-  <span class="p">}</span>
-
-  <span class="c1">////////////////////////////////////////////////////////////
-</span>  <span class="c1">//
-</span>  <span class="c1">// D'tor.  MyString is intended to be a final class, so the d'tor
-</span>  <span class="c1">// doesn't need to be virtual.
-</span>  <span class="c1">//
-</span>  <span class="c1">// 因为MyString作为最终类存在，所以析构函数不必为虚函数
-</span>  <span class="o">~</span><span class="n">MyString</span><span class="p">()</span> <span class="p">{</span> <span class="k">delete</span><span class="p">[]</span> <span class="n">c_string_</span><span class="p">;</span> <span class="p">}</span>
-
-  <span class="c1">// Gets the 0-terminated C string this MyString object represents.
-</span>  <span class="c1">// 获取c_string_
-</span>  <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">c_string</span><span class="p">()</span> <span class="k">const</span> <span class="p">{</span> <span class="k">return</span> <span class="n">c_string_</span><span class="p">;</span> <span class="p">}</span>
-
-  <span class="kt">size_t</span> <span class="n">Length</span><span class="p">()</span> <span class="k">const</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="n">c_string_</span> <span class="o">==</span> <span class="nb">NULL</span> <span class="o">?</span> <span class="mi">0</span> <span class="o">:</span> <span class="n">strlen</span><span class="p">(</span><span class="n">c_string_</span><span class="p">);</span>
-  <span class="p">}</span>
-
-  <span class="c1">// Sets the 0-terminated C string this MyString object represents.
-</span>  <span class="c1">// 设置MyString的c_string_
-</span>  <span class="kt">void</span> <span class="n">Set</span><span class="p">(</span><span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">c_string</span><span class="p">);</span>
-<span class="p">};</span>
-<span class="cp">#endif  // GTEST_SAMPLES_SAMPLE2_H_
-</span>
-<span class="cm">/*sample2.cc*/</span>
-<span class="cp">#include "sample2.h"
-</span>
-<span class="cp">#include &lt;string.h&gt;
-</span>
-<span class="c1">// Clones a 0-terminated C string, allocating memory using new.
-</span><span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">MyString</span><span class="o">::</span><span class="n">CloneCString</span><span class="p">(</span><span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">a_c_string</span><span class="p">)</span> <span class="p">{</span>
-  <span class="k">if</span> <span class="p">(</span><span class="n">a_c_string</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span> <span class="k">return</span> <span class="nb">NULL</span><span class="p">;</span>
-
-  <span class="k">const</span> <span class="kt">size_t</span> <span class="n">len</span> <span class="o">=</span> <span class="n">strlen</span><span class="p">(</span><span class="n">a_c_string</span><span class="p">);</span>
-  <span class="kt">char</span><span class="o">*</span> <span class="k">const</span> <span class="n">clone</span> <span class="o">=</span> <span class="k">new</span> <span class="kt">char</span><span class="p">[</span> <span class="n">len</span> <span class="o">+</span> <span class="mi">1</span> <span class="p">];</span>
-  <span class="n">memcpy</span><span class="p">(</span><span class="n">clone</span><span class="p">,</span> <span class="n">a_c_string</span><span class="p">,</span> <span class="n">len</span> <span class="o">+</span> <span class="mi">1</span><span class="p">);</span>
-
-  <span class="k">return</span> <span class="n">clone</span><span class="p">;</span>
-<span class="p">}</span>
-
-<span class="c1">// Sets the 0-terminated C string this MyString object
-// represents.
-</span><span class="kt">void</span> <span class="n">MyString</span><span class="o">::</span><span class="n">Set</span><span class="p">(</span><span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">a_c_string</span><span class="p">)</span> <span class="p">{</span>
-  <span class="c1">// Makes sure this works when c_string == c_string_
-</span>  <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="k">const</span> <span class="n">temp</span> <span class="o">=</span> <span class="n">MyString</span><span class="o">::</span><span class="n">CloneCString</span><span class="p">(</span><span class="n">a_c_string</span><span class="p">);</span>
-  <span class="k">delete</span><span class="p">[]</span> <span class="n">c_string_</span><span class="p">;</span>
-  <span class="n">c_string_</span> <span class="o">=</span> <span class="n">temp</span><span class="p">;</span>
-<span class="p">}</span>
-
-<span class="cm">/*sample2_unittest.cc*/</span>
-<span class="c1">// This sample shows how to write a more complex unit test for a class
-// that has multiple member functions.
-//
-// Usually, it's a good idea to have one test for each method in your
-// class.  You don't have to do that exactly, but it helps to keep
-// your tests organized.  You may also throw in additional tests as
-// needed.
-//
-// 这个例子将展示如何为一个具有多个成员函数的类编写较为复杂的单元测试
-//
-// 通常为你类中的每一个方法都做一次测试是一个好主意。虽然你并非一定要
-// 这么做，但是这样做将使你的测试集更便于管理，当然你也可以根据需要添
-// 加额外的测试用例
-</span>
-<span class="cp">#include "sample2.h"
-#include "gtest/gtest.h"
-</span>
-<span class="c1">// In this example, we test the MyString class (a simple string).
-</span>
-<span class="c1">// Tests the default c'tor.
-</span><span class="n">TEST</span><span class="p">(</span><span class="n">MyString</span><span class="p">,</span> <span class="n">DefaultConstructor</span><span class="p">)</span> <span class="p">{</span>
-  <span class="k">const</span> <span class="n">MyString</span> <span class="n">s</span><span class="p">;</span>
-
-  <span class="c1">// Asserts that s.c_string() returns NULL.
-</span>  <span class="c1">//
-</span>  <span class="c1">// &lt;TechnicalDetails&gt;
-</span>  <span class="c1">//
-</span>  <span class="c1">// If we write NULL instead of
-</span>  <span class="c1">//
-</span>  <span class="c1">//   static_cast&lt;const char *&gt;(NULL)
-</span>  <span class="c1">//
-</span>  <span class="c1">// in this assertion, it will generate a warning on gcc 3.4.  The
-</span>  <span class="c1">// reason is that EXPECT_EQ needs to know the types of its
-</span>  <span class="c1">// arguments in order to print them when it fails.  Since NULL is
-</span>  <span class="c1">// #defined as 0, the compiler will use the formatter function for
-</span>  <span class="c1">// int to print it.  However, gcc thinks that NULL should be used as
-</span>  <span class="c1">// a pointer, not an int, and therefore complains.
-</span>  <span class="c1">//
-</span>  <span class="c1">// The root of the problem is C++'s lack of distinction between the
-</span>  <span class="c1">// integer number 0 and the null pointer constant.  Unfortunately,
-</span>  <span class="c1">// we have to live with this fact.
-</span>  <span class="c1">//
-</span>  <span class="c1">//技术细节：
-</span>  <span class="c1">//   如果我们使用NULL，而不是static_cast&lt;const char *&gt;(NULL)。在断言中
-</span>  <span class="c1">//如果编译器为gcc3.4,它将产生一个警告。产生警告的原因是，EXPECT_EQ需要
-</span>  <span class="c1">//知道它参数的具体类型，以便产生错误的时候将其输出出来。由于NULL被
-</span>  <span class="c1">//#define定义为0，所以编译器会使用格式化函数来将其输出。然而，GCC认为
-</span>  <span class="c1">//NULL应该被当作指针类型，而不是int整形，所以编译器会抱怨。
-</span>  <span class="c1">//
-</span>  <span class="c1">//产生这个问题的根源是，C++对整数0以及空指针常量缺乏判别依据。不幸的是
-</span>  <span class="c1">//我要学会接受这个现实。
-</span>  <span class="c1">//
-</span>  <span class="c1">// &lt;/TechnicalDetails&gt;
-</span>  <span class="n">EXPECT_STREQ</span><span class="p">(</span><span class="nb">NULL</span><span class="p">,</span> <span class="n">s</span><span class="p">.</span><span class="n">c_string</span><span class="p">());</span>
-
-  <span class="n">EXPECT_EQ</span><span class="p">(</span><span class="mi">0u</span><span class="p">,</span> <span class="n">s</span><span class="p">.</span><span class="n">Length</span><span class="p">());</span>
-<span class="p">}</span>
-
-<span class="k">const</span> <span class="kt">char</span> <span class="n">kHelloString</span><span class="p">[]</span> <span class="o">=</span> <span class="s">"Hello, world!"</span><span class="p">;</span>
-
-<span class="c1">// Tests the c'tor that accepts a C string.
-// 测试构造函数
-</span><span class="n">TEST</span><span class="p">(</span><span class="n">MyString</span><span class="p">,</span> <span class="n">ConstructorFromCString</span><span class="p">)</span> <span class="p">{</span>
-  <span class="k">const</span> <span class="n">MyString</span> <span class="n">s</span><span class="p">(</span><span class="n">kHelloString</span><span class="p">);</span>
-  <span class="n">EXPECT_EQ</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">strcmp</span><span class="p">(</span><span class="n">s</span><span class="p">.</span><span class="n">c_string</span><span class="p">(),</span> <span class="n">kHelloString</span><span class="p">));</span>
-  <span class="n">EXPECT_EQ</span><span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="n">kHelloString</span><span class="p">)</span><span class="o">/</span><span class="k">sizeof</span><span class="p">(</span><span class="n">kHelloString</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span>
-            <span class="n">s</span><span class="p">.</span><span class="n">Length</span><span class="p">());</span>
-<span class="p">}</span>
-
-<span class="c1">// Tests the copy c'tor.
-// 测试拷贝构造函数
-</span><span class="n">TEST</span><span class="p">(</span><span class="n">MyString</span><span class="p">,</span> <span class="n">CopyConstructor</span><span class="p">)</span> <span class="p">{</span>
-  <span class="k">const</span> <span class="n">MyString</span> <span class="n">s1</span><span class="p">(</span><span class="n">kHelloString</span><span class="p">);</span>
-  <span class="k">const</span> <span class="n">MyString</span> <span class="n">s2</span> <span class="o">=</span> <span class="n">s1</span><span class="p">;</span>
-  <span class="c1">//下面的判断会是失败的
-</span>  <span class="n">EXPECT_EQ</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">strcmp</span><span class="p">(</span><span class="n">s2</span><span class="p">.</span><span class="n">c_string</span><span class="p">(),</span> <span class="n">kHelloString</span><span class="p">));</span>
-<span class="p">}</span>
-
-<span class="c1">// Tests the Set method.
-// 测试Set方法
-</span><span class="n">TEST</span><span class="p">(</span><span class="n">MyString</span><span class="p">,</span> <span class="n">Set</span><span class="p">)</span> <span class="p">{</span>
-  <span class="n">MyString</span> <span class="n">s</span><span class="p">;</span>
-
-  <span class="n">s</span><span class="p">.</span><span class="n">Set</span><span class="p">(</span><span class="n">kHelloString</span><span class="p">);</span>
-  <span class="n">EXPECT_EQ</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">strcmp</span><span class="p">(</span><span class="n">s</span><span class="p">.</span><span class="n">c_string</span><span class="p">(),</span> <span class="n">kHelloString</span><span class="p">));</span>
-
-  <span class="c1">// Set should work when the input pointer is the same as the one
-</span>  <span class="c1">// already in the MyString object.
-</span>  <span class="c1">//
-</span>  <span class="c1">// Set函数在输入指针与已存在于MyString对象中的指针相同时，下面的
-</span>  <span class="c1">// 测试才会通过
-</span>  <span class="n">s</span><span class="p">.</span><span class="n">Set</span><span class="p">(</span><span class="n">s</span><span class="p">.</span><span class="n">c_string</span><span class="p">());</span>
-  <span class="n">EXPECT_EQ</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">strcmp</span><span class="p">(</span><span class="n">s</span><span class="p">.</span><span class="n">c_string</span><span class="p">(),</span> <span class="n">kHelloString</span><span class="p">));</span>
-
-  <span class="c1">// Can we set the MyString to NULL?
-</span>  <span class="n">s</span><span class="p">.</span><span class="n">Set</span><span class="p">(</span><span class="nb">NULL</span><span class="p">);</span>
-  <span class="n">EXPECT_STREQ</span><span class="p">(</span><span class="nb">NULL</span><span class="p">,</span><span class="n">s</span><span class="p">.</span><span class="n">c_string</span><span class="p">());</span>
-<span class="p">}</span></code></pre></figure>
-
-<p>sample2的运行截图：
-<img src="/images/unittest/2.png" alt="" /></p>
-
-<p>例一阐述的是如果对普通的函数进行单元测试，而例二则阐述如何对类中的成员函数进行单元测试。大致的方法基本相同，只不过在测试类成员函数之前，要先定义类，也就是例子中的MyString s;上述两个例子是gtest的简单应用，当然对于类中成员函数的单元测试要复杂的多，比如成员函数的公有还是私有，成员函数的耦合性等等，这些会在最后的单元测试实践中讨论。好了，初步的介绍就到这吧~</p>
 
 
 	  ]]></description>

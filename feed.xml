@@ -8,6 +8,22 @@
     
       
       <item>
+        <title>kubernetes在测试中的应用实践</title>
+        
+          <description>&lt;h4&gt;前言&lt;/h4&gt;
+&lt;p&gt;在休假之前就想写一写kubernetes在测试中应用的一些事，后来因为各种原因被耽搁了下来。这次趁着休假期间的空闲，把应用方面的东西梳理一下，算做是对之前一段研究东西的总结。&lt;/p&gt;
+
+</description>
+        
+        <pubDate>Tue, 29 Aug 2017 19:28:00 +0000</pubDate>
+        <link>
+        http://airfer.github.io//k8s-practice</link>
+        <guid isPermaLink="true">http://airfer.github.io//k8s-practice</guid>
+      </item>
+      
+    
+      
+      <item>
         <title>基于Ansible &amp;&amp; Docker的分布式系统(下)</title>
         
           <description>&lt;h4&gt;前言：&lt;/h4&gt;

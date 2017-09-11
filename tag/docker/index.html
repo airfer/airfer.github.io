@@ -69,12 +69,11 @@
     </a>
     <ul>
         <li class="nav-home " role="presentation"><a href="/">Home</a></li>
-        <li class="nav-about " role="presentation"><a href="/about">About</a></li>
+        <li class="nav-summerize " role="presentation"><a href="/tag/summerize">Summerize</a></li>
+        <li class="nav-docker  nav-current" role="presentation"><a href="/tag/docker">Docker&K8s</a></li>
         <li class="nav-Monitor " role="presentation"><a href="/tag/monitor">Monitor</a></li>
-        <li class="nav-docker  nav-current" role="presentation"><a href="/tag/docker">Docker</a></li>
         <li class="nav-unittest " role="presentation"><a href="/tag/unittest">Unittest</a></li>
-        <li class="nav-unittest " role="presentation"><a href="/tag/pay">Pay</a></li>
-        <li class="nav-author " role="presentation"><a href="/author/casper">Author</a></li>
+        <li class="nav-pay " role="presentation"><a href="/tag/pay">Pay</a></li>
     </ul>
     <a class="subscribe-button icon-feed" href="/feed.xml">Subscribe</a>
 </div>
@@ -103,7 +102,7 @@
             <h1 class="page-title">Docker</h1>
             <h2 class="page-description">
             
-			    A 3-post collection
+			    A 6-post collection
             
             </h2>
         </div>
@@ -119,7 +118,9 @@
         
             <nav class="pagination" role="pagination">
     
-    <span class="page-number"> Page 1 of 1 </span>
+    <span class="page-number"> Page 1 of 2 </span>
+     
+        <a class="older-posts" href="/tag/docker/page2/" title="Next Page">Older Posts &raquo;</a>
      
 </nav>
 
@@ -157,6 +158,84 @@
     
     <article class="post">
         <header class="post-header">
+            <h5 class="post-title"><a href="/ansible-docker-2">基于Ansible && Docker的分布式系统(下)</a></h5>
+        </header>
+        <section class="post-excerpt">
+            <p>前言：
+在上一篇中，我们主要从Poster入手，然后讲述了为何进行这样的技术选型，分别从docker和ansible两个方面来阐述了原因，本篇的重点在于分析集成于镜像中的Unicorn工程，以及playbook脚本的编写。
+
+一、Unicorn工... <a class="read-more" href="/ansible-docker-2">&raquo;</a></p>
+        </section>
+        <footer class="post-meta">
+            <img class="author-thumb" src="/assets/images/casper.png" alt="Author image" nopin="nopin" />
+            <!-- author -->
+            <a href='/author/neo'>Wang Yukun</a>
+            <!-- [[tags prefix=" on "]] -->
+             
+                on 
+                
+                    
+                       <a href='/tag/docker'>Docker</a>
+                       
+                
+            
+            <time class="post-date" datetime="2017-06-28">28 Jun 2017</time>
+        </footer>
+    </article>
+    
+    <article class="post">
+        <header class="post-header">
+            <h5 class="post-title"><a href="/k8s-practic-install">k8s实践日记之安装篇</a></h5>
+        </header>
+        <section class="post-excerpt">
+            <p>其实很早就想深入了解一下容器编排工具，但是由于各种各样的事情，被耽搁了很久。最近就抽时间认真学习了一下kubernets（K8S）,虽然对其原理还未深入的了解，但是从初步掌握的情况来看，真的是一个非常牛的框架，本系列就先从安装篇开始（Centos... <a class="read-more" href="/k8s-practic-install">&raquo;</a></p>
+        </section>
+        <footer class="post-meta">
+            <img class="author-thumb" src="/assets/images/casper.png" alt="Author image" nopin="nopin" />
+            <!-- author -->
+            <a href='/author/neo'>Wang Yukun</a>
+            <!-- [[tags prefix=" on "]] -->
+             
+                on 
+                
+                    
+                       <a href='/tag/docker'>Docker</a>
+                       
+                
+            
+            <time class="post-date" datetime="2017-05-22">22 May 2017</time>
+        </footer>
+    </article>
+    
+    <article class="post">
+        <header class="post-header">
+            <h5 class="post-title"><a href="/ansible-docker-1">基于Ansible && Docker的分布式系统(上)</a></h5>
+        </header>
+        <section class="post-excerpt">
+            <p>从最初的V1.0的分布式用例框架，到现在已经发展到V3.0版本，功能已经越来越完善，执行效率相比第一版也有了质的提升。遇见不同，其实就是见证全新的自己，我相信我们在这条道路上会越走越好。
+
+Poster
+前一段时间，部门内部举办了一场技术开放日活... <a class="read-more" href="/ansible-docker-1">&raquo;</a></p>
+        </section>
+        <footer class="post-meta">
+            <img class="author-thumb" src="/assets/images/casper.png" alt="Author image" nopin="nopin" />
+            <!-- author -->
+            <a href='/author/neo'>Wang Yukun</a>
+            <!-- [[tags prefix=" on "]] -->
+             
+                on 
+                
+                    
+                       <a href='/tag/docker'>Docker</a>
+                       
+                
+            
+            <time class="post-date" datetime="2017-03-25">25 Mar 2017</time>
+        </footer>
+    </article>
+    
+    <article class="post">
+        <header class="post-header">
             <h5 class="post-title"><a href="/pc-ads-distribution-docker">基于 Docker 的分布式测试系统构建 (二)</a></h5>
         </header>
         <section class="post-excerpt">
@@ -180,38 +259,14 @@
         </footer>
     </article>
     
-    <article class="post">
-        <header class="post-header">
-            <h5 class="post-title"><a href="/pc_ads-distribution-prepare-docker">基于 Docker 的分布式测试系统构建 (一)</a></h5>
-        </header>
-        <section class="post-excerpt">
-            <p>前言
-
-关于如何运用docker来解决现实问题并非是一个新鲜的问题，关于docker在测试方面的应用也有很多的文章，本篇是在前人的基础上研究了如何结合业务逻辑构建基于docker的分布式测试系统。当然初次研究肯定有很多不完善的地方，希望抛砖引玉，... <a class="read-more" href="/pc_ads-distribution-prepare-docker">&raquo;</a></p>
-        </section>
-        <footer class="post-meta">
-            <img class="author-thumb" src="/assets/images/casper.png" alt="Author image" nopin="nopin" />
-            <!-- author -->
-            <a href='/author/neo'>Wang Yukun</a>
-            <!-- [[tags prefix=" on "]] -->
-             
-                on 
-                
-                    
-                       <a href='/tag/docker'>Docker</a>
-                       
-                
-            
-            <time class="post-date" datetime="2016-10-25">25 Oct 2016</time>
-        </footer>
-    </article>
-    
 
     <!-- Previous/next page links - displayed on every page -->
     
         <nav class="pagination" role="pagination">
     
-    <span class="page-number"> Page 1 of 1 </span>
+    <span class="page-number"> Page 1 of 2 </span>
+     
+        <a class="older-posts" href="/tag/docker/page2/" title="Next Page">Older Posts &raquo;</a>
      
 </nav>
 

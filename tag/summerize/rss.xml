@@ -12,6 +12,20 @@
    <atom:link href="rss" rel="self" type="application/rss+xml" />
    
 	<item>
+	  <title>2018Q1季度测试总结</title>
+	  <link>//sumerize-q1</link>
+	  <author>Wang Yukun</author>
+	  <pubDate>2018-04-08T19:28:00+00:00</pubDate>
+	  <guid>//sumerize-q1</guid>
+	  <description><![CDATA[
+	     <p>
+<a href="http://note.youdao.com/noteshare?id=27988775a0a8c688c4f076d611a62367">2018Q1季度测试总结</a>
+</p>
+
+	  ]]></description>
+	</item>
+
+	<item>
 	  <title>服务端功能测试小记</title>
 	  <link>//summerize-for-server-test</link>
 	  <author>Wang Yukun</author>

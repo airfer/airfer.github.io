@@ -6,7 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 
     <!-- [[! Page Meta ]] -->
-    <title>Finding The Way Home</title>
+    <title>Sometimes Things Happen For A Reason</title>
     <meta name="description" content="Sometimes Things Happen For A Reason - There are some things in this world will never change and some things do change,everything that has a beginning has an end " />
 
     <meta name="HandheldFriendly" content="True" />
@@ -68,7 +68,7 @@
         <span class="hidden">Close</span>
     </a>
     <ul>
-        <li class="nav-home  nav-current" role="presentation"><a href="/">Home</a></li>
+        <li class="nav-home " role="presentation"><a href="/">Home</a></li>
         <li class="nav-summerize " role="presentation"><a href="/tag/summerize">Summerize</a></li>
         <li class="nav-docker " role="presentation"><a href="/tag/docker">Docker&K8s</a></li>
         <li class="nav-Monitor " role="presentation"><a href="/tag/monitor">Monitor</a></li>
@@ -83,12 +83,14 @@
     <div class="site-wrapper">
 
         <!-- [[! Everything else gets inserted here ]] -->
-        <!-- < default -->
+        <!-- < dynamically overriding backgrounds for tags as well as descriptions -->
+
+
+<!-- < default}} -->
 <!-- The tag above means - insert everything in this file into the [body] of the default.hbs template -->
 
-<!-- The big featured header  -->
-<header class="main-header "
-        style="background-image: url(/assets/images/new_pic22.jpg) ">
+<!-- If we have a tag cover, display that - else blog cover - else nothing -->
+<header class="main-header tag-head " style="background-image: url(/assets/images/new-pic-6.jpg) ">
     <nav class="main-nav overlay clearfix">
         <a class="blog-logo" href="/"><img src="/assets/images/ghost.png" alt="Blog Logo" /></a>
         
@@ -97,11 +99,14 @@
     </nav>
     <div class="vertical">
         <div class="main-header-content inner">
-            <h1 class="page-title">Sometimes Things Happen For A Reason</h1>
-            <h2 class="page-description">There are some things in this world will never change and some things do change,everything that has a beginning has an end </h2>
+            <h1 class="page-title">Summerize</h1>
+            <h2 class="page-description">
+            
+			    A 6-post collection
+            
+            </h2>
         </div>
     </div>
-    <a class="scroll-down icon-arrow-left" href="#content" data-offset="-45"><span class="hidden">Scroll Down</span></a>
 </header>
 
 <!-- The main content area on the homepage -->
@@ -114,76 +119,17 @@
             <nav class="pagination" role="pagination">
     
         
-            <a class="newer-posts" href="/page3/" title="Previous Page">&laquo; Newer Posts</a>
-      
+            <a class="newer-posts" href="/tag/summerize" title="Previous Page">&laquo; Newer Posts</a>
+        
     
-    <span class="page-number"> Page 4 of 5 </span>
-     
-        <a class="older-posts" href="/page5/" title="Next Page">Older Posts &raquo;</a>
+    <span class="page-number"> Page 2 of 2 </span>
      
 </nav>
+
         
     </div>
 
     <!-- This is the post loop - each post will be output using this markup -->
-    
-    <article class="post">
-        <header class="post-header">
-            <h5 class="post-title"><a href="/pay-part4">支付网关逻辑之网关交易</a></h5>
-        </header>
-        <section class="post-excerpt">
-            <p>前言
-
-支付底层服务最难的部分便是根据不同的支付场景进行各种复杂的逻辑记账。不同场景的逻辑记账搞清楚了，那么
-整个的底层服务也就清晰明了。这个部分上手也是最难的，常用的方法就是根据底层服务的日志信息进行分析，得到
-数据库操作的流程信息，结合这些日... <a class="read-more" href="/pay-part4">&raquo;</a></p>
-        </section>
-        <footer class="post-meta">
-            <img class="author-thumb" src="/assets/images/cat.jpg" alt="Author image" nopin="nopin" />
-            <!-- author -->
-            <a href='/author/neo'>Wang Yukun</a>
-            <!-- [[tags prefix=" on "]] -->
-             
-                on 
-                
-                    
-                       <a href='/tag/pay'>Pay</a>
-                       
-                
-            
-            <time class="post-date" datetime="2015-10-09">09 Oct 2015</time>
-        </footer>
-    </article>
-    
-    <article class="post">
-        <header class="post-header">
-            <h5 class="post-title"><a href="/begin-to-know-pay-service">支付业务入门及实践</a></h5>
-        </header>
-        <section class="post-excerpt">
-            <p>前言
-
-对于一些比较复杂的业务，其业务逻辑是十分复杂的。如果只是通过口耳相授，很难将复杂的逻辑讲清楚，也很难在短时间内让新人上手。对于一个团队来说，业务逻辑知识以及测试自动化技术的沉淀显得尤为重要。现在就业务入门及相关指导进行梳理。
-
-
-
-一、整... <a class="read-more" href="/begin-to-know-pay-service">&raquo;</a></p>
-        </section>
-        <footer class="post-meta">
-            <img class="author-thumb" src="/assets/images/cat.jpg" alt="Author image" nopin="nopin" />
-            <!-- author -->
-            <a href='/author/neo'>Wang Yukun</a>
-            <!-- [[tags prefix=" on "]] -->
-             
-                on 
-                
-                    
-                       <a href='/tag/pay'>Pay</a>
-                       
-                
-            
-            <time class="post-date" datetime="2015-09-15">15 Sep 2015</time>
-        </footer>
-    </article>
     
     <article class="post">
         <header class="post-header">
@@ -211,76 +157,19 @@
         </footer>
     </article>
     
-    <article class="post">
-        <header class="post-header">
-            <h5 class="post-title"><a href="/pay-part3">支付网关逻辑之特殊场景</a></h5>
-        </header>
-        <section class="post-excerpt">
-            <p>前言
-在支付的过程中，很多时候会有特殊的场景出现，现有的支付系统必须能够做到对支付的异常状况进行处理。
-在这篇文章里，将对一些特殊的情况进行说明。
-
-一、对账
-对账的目的就是核对账目的准确性，保证出现错误的订单可以在对账的过程中被找到，完成对账的... <a class="read-more" href="/pay-part3">&raquo;</a></p>
-        </section>
-        <footer class="post-meta">
-            <img class="author-thumb" src="/assets/images/cat.jpg" alt="Author image" nopin="nopin" />
-            <!-- author -->
-            <a href='/author/neo'>Wang Yukun</a>
-            <!-- [[tags prefix=" on "]] -->
-             
-                on 
-                
-                    
-                       <a href='/tag/pay'>Pay</a>
-                       
-                
-            
-            <time class="post-date" datetime="2015-08-12">12 Aug 2015</time>
-        </footer>
-    </article>
-    
-    <article class="post">
-        <header class="post-header">
-            <h5 class="post-title"><a href="/pay-part2">支付网关之场景支付</a></h5>
-        </header>
-        <section class="post-excerpt">
-            <p>前言
-在了解基本的支付网关逻辑数据库的设计原理之后，就可将所学到的知识用于实际的场景支付测试中
-不同的支付场景，支付的逻辑也迥然不同。常见的场景支付有普通的网关交易，如用户在线购物；还有如
-商户现金红包派发、优惠券组合支付、个人钱包充值消费退回、... <a class="read-more" href="/pay-part2">&raquo;</a></p>
-        </section>
-        <footer class="post-meta">
-            <img class="author-thumb" src="/assets/images/cat.jpg" alt="Author image" nopin="nopin" />
-            <!-- author -->
-            <a href='/author/neo'>Wang Yukun</a>
-            <!-- [[tags prefix=" on "]] -->
-             
-                on 
-                
-                    
-                       <a href='/tag/pay'>Pay</a>
-                       
-                
-            
-            <time class="post-date" datetime="2015-08-10">10 Aug 2015</time>
-        </footer>
-    </article>
-    
 
     <!-- Previous/next page links - displayed on every page -->
     
         <nav class="pagination" role="pagination">
     
         
-            <a class="newer-posts" href="/page3/" title="Previous Page">&laquo; Newer Posts</a>
-      
+            <a class="newer-posts" href="/tag/summerize" title="Previous Page">&laquo; Newer Posts</a>
+        
     
-    <span class="page-number"> Page 4 of 5 </span>
-     
-        <a class="older-posts" href="/page5/" title="Next Page">Older Posts &raquo;</a>
+    <span class="page-number"> Page 2 of 2 </span>
      
 </nav>
+
     
 
 

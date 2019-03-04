@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!-- [[! Document Settings ]] -->
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+    <!-- [[! Page Meta ]] -->
+    <title>支付网关逻辑之特殊场景</title>
+    <meta name="description" content="Sometimes Things Happen For A Reason - There are some things in this world will never change and some things do change,everything that has a beginning has an end " />
+
+    <meta name="HandheldFriendly" content="True" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <link rel="shortcut icon" href="/assets/images/favicon.ico" >
+
+    <!-- [[! Styles'n'Scripts ]] -->
+    <link rel="stylesheet" type="text/css" href="/assets/css/screen.css" />
+    <link rel="stylesheet" type="text/css"
+          href="//fonts.googleapis.com/css?family=Merriweather:300,700,700italic,300italic|Open+Sans:700,400" />
+    <link rel="stylesheet" type="text/css" href="/assets/css/syntax.css" />
+
+    <!-- [[! highlight.js ]] -->
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.3.0/styles/default.min.css">
+    <style>.hljs { background: none; }</style>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.3.0/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+
+    <!-- [[! Ghost outputs important style and meta data with this tag ]] -->
+        <link rel="canonical" href="/" />
+    <meta name="referrer" content="origin" />
+    <link rel="next" href="/page2/" />
+
+    <meta property="og:site_name" content="Sometimes Things Happen For A Reason" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Sometimes Things Happen For A Reason" />
+    <meta property="og:description" content="There are some things in this world will never change and some things do change,everything that has a beginning has an end " />
+    <meta property="og:url" content="/" />
+    <meta property="og:image" content="/assets/images/cover2.jpg" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Sometimes Things Happen For A Reason" />
+    <meta name="twitter:description" content="There are some things in this world will never change and some things do change,everything that has a beginning has an end " />
+    <meta name="twitter:url" content="/" />
+    <meta name="twitter:image:src" content="/assets/images/cover2.jpg" />
+
+    <script type="application/ld+json">
+{
+    "@context": "http://schema.org",
+    "@type": "Website",
+    "publisher": "Finding The Way Home",
+    "url": "/",
+    "image": "/assets/images/cover1.jpg",
+    "description": "There are some things in this world will never change and some things do change,everything that has a beginning has an end "
+}
+    </script>
+
+    <meta name="generator" content="Jekyll 3.0.0" />
+    <link rel="alternate" type="application/rss+xml" title="Sometimes Things Happen For A Reason" href="/feed.xml" />
+
+
+</head>
+<body class="home-template nav-closed">
+
+    <div class="nav">
+    <h3 class="nav-title">Menu</h3>
+    <a href="#" class="nav-close">
+        <span class="hidden">Close</span>
+    </a>
+    <ul>
+        <li class="nav-home " role="presentation"><a href="/">Home</a></li>
+        <li class="nav-summerize " role="presentation"><a href="/tag/summerize">Summerize</a></li>
+        <li class="nav-docker " role="presentation"><a href="/tag/docker">Docker&K8s</a></li>
+        <li class="nav-Monitor " role="presentation"><a href="/tag/monitor">Monitor</a></li>
+        <li class="nav-unittest " role="presentation"><a href="/tag/unittest">Unittest</a></li>
+        <li class="nav-pay  nav-current" role="presentation"><a href="/tag/pay">Pay</a></li>
+    </ul>
+    <a class="subscribe-button icon-feed" href="/feed.xml">Subscribe</a>
+</div>
+<span class="nav-cover"></span>
+
+
+    <div class="site-wrapper">
+
+        <!-- [[! Everything else gets inserted here ]] -->
+        <!-- < default -->
+
+<!-- The comment above "< default" means - insert everything in this file into -->
+    <!-- the [body] of the default.hbs template, which contains our header/footer. -->
+
+<!-- Everything inside the #post tags pulls data from the post -->
+<!-- #post -->
+
+<header class="main-header post-head " style="background-image: url(/assets/images/new-pic-8.jpg) ">
+    <nav class="main-nav  overlay  clearfix">
+        <a class="blog-logo" href="/"><img src="/assets/images/ghost.png" alt="Blog Logo" /></a>
+        
+            <a class="menu-button icon-menu" href="#"><span class="word">Menu</span></a>
+        
+    </nav>
+</header>
+
+<main class="content" role="main">
+
+    <article class="post tag-test tag-content">
+
+        <header class="post-header">
+            <h1 class="post-title">支付网关逻辑之特殊场景</h1>
+            <section class="post-meta">
+            <!-- <a href='/'>Wang Yukun</a> -->
+            <time class="post-date" datetime="2015-08-12">12 Aug 2015</time>
+                <!-- [[tags prefix=" on "]] -->
+                 
+                on 
+                
+                    
+                       <a href='/tag/pay'>Pay</a>
+                       
+                
+                
+            </section>
+        </header>
+
+        <section class="post-content">
+            
+            <h4>前言</h4>
+<p>在支付的过程中，很多时候会有特殊的场景出现，现有的支付系统必须能够做到对支付的异常状况进行处理。
+在这篇文章里，将对一些特殊的情况进行说明。</p>
+
+<h3 id="section">一、对账</h3>
+<p>对账的目的就是核对账目的准确性，保证出现错误的订单可以在对账的过程中被找到，完成对账的步骤如下：</p>
+
+<ul>
+  <li>
+    <p>内部对账过程。内部对账其实是一种数据信息收集的过程，如果收集的是付款信息，那么进行的是付款对账；
+如果收集的是收款信息，那么进行的就是收款对账；根据信息收集类型的不同，对账也就不同</p>
+  </li>
+  <li>
+    <p>上传文件解析。内部对账结束后，将在数据库中生成内部对账的信息数据表，这些信息存储在数据库中。对账肯定
+是两方数据，一方数据为本身支付平台的数据；而另一方则为银行返回的对账文件。在这个阶段需要对银行返回的对账
+文件进行解析，并获取到对账所需的相关信息。完成这个过程后，同样在数据库中会生成相关的数据信息。</p>
+  </li>
+  <li>
+    <p>外部对账过程。在收集完内部数据，并完成对银行返回的对账文件的解析后，就具备了外部对账的基础。外部对账
+程序将就同一订单号的交易数据在内部对账信息以及银行对账文件信息进行一一比对。所有的订单信息对比完后，对账的
+过程也就结束了。</p>
+  </li>
+  <li>
+    <p>对账结果说明。对账完成后，对账结果正确的数据放入对平表中，而对账失败的数据则放入对差表中。当对差表中有数据时
+可能需要根据情况再行处理。</p>
+  </li>
+</ul>
+
+<h3 id="section-1">二、掉单</h3>
+<p>交易掉单实质是在银行与支付平台之间出现数据不同步。</p>
+
+<p>掉单的场景发生如下：客户银行卡中的钱已经被扣除，但是银行或者第三方支付机构返回信息给我们说，此笔付款没有成功。由于客户在平台的订单为未支付，所以此时需要补单的操作。</p>
+
+<ul>
+  <li>补单操作实际上是一个加款的动作</li>
+  <li>实际场景中，发生补单并不是十分多见</li>
+</ul>
+
+<h3 id="section-2">三、退票</h3>
+<p>退票的场景是多数发生在用户提现的情形下，当然也会发生在向用户付款的其他情形。用户提现时，用户的银行卡信息不对，或者
+是向用户退款时，用户的银行卡不可用，这个场景下就需要退票。</p>
+
+<ul>
+  <li>退票场景出现在，商户钱已被扣除，但是向用户支付时出现错误的场景</li>
+  <li>已有场景包括提现、退款、基金赎回等场景</li>
+</ul>
+
+<hr />
+
+<h3 id="section-3">三、总结</h3>
+
+<p>本章对支付系统的中对账以及掉单、退票进行了阐述，具体测试操作还要根据实际情况而定。</p>
+
+
+        </section>
+
+        <footer class="post-footer">
+
+            <!-- Everything inside the #author tags pulls data from the author -->
+            <!-- #author-->
+
+            
+            <figure class="author-image">
+                <a class="img" href="/author/neo" style="background-image: url(/assets/images/cat.jpg)"><span class="hidden">'s Picture</span></a>
+            </figure>
+            
+
+            <section class="author">
+                <h4><a href="/author/neo">Wang Yukun</a></h4>
+                
+                
+                    <p> Looking up to the Starry Sky && Keep both feet firmly on the ground</p>
+                
+                <div class="author-meta">
+                    <span class="author-location icon-location"> Beijing, China</span> 
+                    <span class="author-link icon-link"><a href="http://airfer.github.io/"> airfer.github.io/</a></span> 
+                </div>
+            </section>
+
+            <!-- /author  -->
+
+            <section class="share">
+                <h4>Share this post</h4>
+                <a class="icon-twitter" href="http://twitter.com/share?text=支付网关逻辑之特殊场景&amp;url=http://airfer.github.io/pay-part3"
+                    onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+                    <span class="hidden">Twitter</span>
+                </a>
+                <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=http://airfer.github.io/pay-part3"
+                    onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+                    <span class="hidden">Facebook</span>
+                </a>
+                <a class="icon-google-plus" href="https://plus.google.com/share?url=http://airfer.github.io/pay-part3"
+                   onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+                    <span class="hidden">Google+</span>
+                </a>
+            </section>
+            
+            <!-- Add Disqus Comments -->
+            
+            
+        </footer>
+
+    </article>
+
+</main>
+
+<aside class="read-next">
+
+    <!-- [[! next_post ]] -->
+    
+        <a class="read-next-story " style="background-image: url(/assets/images/new-pic-6.jpg)" href="/articles-published-in-maimai">
+            <section class="post">
+                <h2>发布在脉脉上的一些文章</h2>
+                <p>前言 
+
+测试做的久了，可能会对测试本身有很多的看法，本篇算是对测试理念以及测试技术的个人总结及感悟吧。当谈到对测试的理解可能每个人的理解都不相同，这和个人所从事的业务测试，以及自己在测试中形成的固有观点有关，不能直接的就评判这种测试...</p>
+            </section>
+        </a>
+    
+    <!-- [[! /next_post ]] -->
+    <!-- [[! prev_post ]] -->
+    
+        <a class="read-next-story prev " style="background-image: url(/assets/images/new-pic-10.jpg)" href="/pay-part2">
+            <section class="post">
+                <h2>支付网关之场景支付</h2>
+                <p>前言
+在了解基本的支付网关逻辑数据库的设计原理之后，就可将所学到的知识用于实际的场景支付测试中
+不同的支付场景，支付的逻辑也迥然不同。常见的场景支付有普通的网关交易，如用户在线购物；还有如
+商户现金红包派发、优惠券组合支付、个人钱包充...</p>
+            </section>
+        </a>
+    
+    <!-- [[! /prev_post ]] -->
+</aside>
+
+<!-- /post -->
+
+
+        <footer class="site-footer clearfix">
+          <section class="copyright"><a href="/">Sometimes Things Happen For A Reason</a> &copy; 2019</section>
+          <section class="poweredby">Proudly published with <a href="https://jekyllrb.com/">Jekyll</a> using <a href="https://github.com/biomadeira/jasper">Jasper</a></section>
+        </footer>
+    </div>
+    <!-- [[! Ghost outputs important scripts and data with this tag ]] -->
+    <script type="text/javascript" src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+    <!-- [[! The main JavaScript file for Casper ]] -->
+    <script type="text/javascript" src="/assets/js/jquery.fitvids.js"></script>
+    <script type="text/javascript" src="/assets/js/index.js"></script>
+
+    <!-- Add Google Analytics  -->
+        <!-- Google Analytics Tracking code -->
+     <script>
+	    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+	    ga('create', 'UA-69281367-1', 'auto');
+	    ga('send', 'pageview');
+
+     </script>   
+</body>
+</html>

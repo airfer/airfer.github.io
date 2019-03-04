@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!-- [[! Document Settings ]] -->
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+    <!-- [[! Page Meta ]] -->
+    <title>k8s实践日记之安装篇</title>
+    <meta name="description" content="Sometimes Things Happen For A Reason - There are some things in this world will never change and some things do change,everything that has a beginning has an end " />
+
+    <meta name="HandheldFriendly" content="True" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <link rel="shortcut icon" href="/assets/images/favicon.ico" >
+
+    <!-- [[! Styles'n'Scripts ]] -->
+    <link rel="stylesheet" type="text/css" href="/assets/css/screen.css" />
+    <link rel="stylesheet" type="text/css"
+          href="//fonts.googleapis.com/css?family=Merriweather:300,700,700italic,300italic|Open+Sans:700,400" />
+    <link rel="stylesheet" type="text/css" href="/assets/css/syntax.css" />
+
+    <!-- [[! highlight.js ]] -->
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.3.0/styles/default.min.css">
+    <style>.hljs { background: none; }</style>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.3.0/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+
+    <!-- [[! Ghost outputs important style and meta data with this tag ]] -->
+        <link rel="canonical" href="/" />
+    <meta name="referrer" content="origin" />
+    <link rel="next" href="/page2/" />
+
+    <meta property="og:site_name" content="Sometimes Things Happen For A Reason" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Sometimes Things Happen For A Reason" />
+    <meta property="og:description" content="There are some things in this world will never change and some things do change,everything that has a beginning has an end " />
+    <meta property="og:url" content="/" />
+    <meta property="og:image" content="/assets/images/cover2.jpg" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Sometimes Things Happen For A Reason" />
+    <meta name="twitter:description" content="There are some things in this world will never change and some things do change,everything that has a beginning has an end " />
+    <meta name="twitter:url" content="/" />
+    <meta name="twitter:image:src" content="/assets/images/cover2.jpg" />
+
+    <script type="application/ld+json">
+{
+    "@context": "http://schema.org",
+    "@type": "Website",
+    "publisher": "Finding The Way Home",
+    "url": "/",
+    "image": "/assets/images/cover1.jpg",
+    "description": "There are some things in this world will never change and some things do change,everything that has a beginning has an end "
+}
+    </script>
+
+    <meta name="generator" content="Jekyll 3.0.0" />
+    <link rel="alternate" type="application/rss+xml" title="Sometimes Things Happen For A Reason" href="/feed.xml" />
+
+
+</head>
+<body class="home-template nav-closed">
+
+    <div class="nav">
+    <h3 class="nav-title">Menu</h3>
+    <a href="#" class="nav-close">
+        <span class="hidden">Close</span>
+    </a>
+    <ul>
+        <li class="nav-home " role="presentation"><a href="/">Home</a></li>
+        <li class="nav-summerize " role="presentation"><a href="/tag/summerize">Summerize</a></li>
+        <li class="nav-docker " role="presentation"><a href="/tag/docker">Docker&K8s</a></li>
+        <li class="nav-Monitor " role="presentation"><a href="/tag/monitor">Monitor</a></li>
+        <li class="nav-unittest " role="presentation"><a href="/tag/unittest">Unittest</a></li>
+        <li class="nav-pay " role="presentation"><a href="/tag/pay">Pay</a></li>
+    </ul>
+    <a class="subscribe-button icon-feed" href="/feed.xml">Subscribe</a>
+</div>
+<span class="nav-cover"></span>
+
+
+    <div class="site-wrapper">
+
+        <!-- [[! Everything else gets inserted here ]] -->
+        <!-- < default -->
+
+<!-- The comment above "< default" means - insert everything in this file into -->
+    <!-- the [body] of the default.hbs template, which contains our header/footer. -->
+
+<!-- Everything inside the #post tags pulls data from the post -->
+<!-- #post -->
+
+<header class="main-header post-head " style="background-image: url(/assets/images/new-pic-16.jpg) ">
+    <nav class="main-nav  overlay  clearfix">
+        <a class="blog-logo" href="/"><img src="/assets/images/ghost.png" alt="Blog Logo" /></a>
+        
+            <a class="menu-button icon-menu" href="#"><span class="word">Menu</span></a>
+        
+    </nav>
+</header>
+
+<main class="content" role="main">
+
+    <article class="post tag-test tag-content">
+
+        <header class="post-header">
+            <h1 class="post-title">k8s实践日记之安装篇</h1>
+            <section class="post-meta">
+            <!-- <a href='/'>Wang Yukun</a> -->
+            <time class="post-date" datetime="2017-05-22">22 May 2017</time>
+                <!-- [[tags prefix=" on "]] -->
+                 
+                on 
+                
+                    
+                       <a href='/tag/docker'>Docker</a>
+                       
+                
+                
+            </section>
+        </header>
+
+        <section class="post-content">
+            
+            <p>其实很早就想深入了解一下容器编排工具，但是由于各种各样的事情，被耽搁了很久。最近就抽时间认真学习了一下kubernets（K8S）,虽然对其原理还未深入的了解，但是从初步掌握的情况来看，真的是一个非常牛的框架，本系列就先从安装篇开始（Centos7下）。</p>
+
+<h4>关于标准安装方式</h4>
+<p>其实就是使用kubeadm进行安装，k8s的核心组件全部容器化
+https://kubernetes.io/docs/getting-started-guides/kubeadm/
+安装之前，需要注意的地方：
+- 限制条件，在官方文档中放在最后了，就是Limitations部分，先进行着部分的配置
+- 修改/etc/hosts文件，添加本机非lo地址和所对应的名称</p>
+
+<h4>安装过程中存在的问题</h4>
+<p>安装过程中存在很多问题，一些比较简单的，稍微查找下资料就可以解决，但是有些却要费一些功夫。除了官方提供的安装教程，网上也有很多网友自发编写的，比如下方的安装教程2.
+安装教程2：
+http://blog.frognew.com/2017/04/kubeadm-install-kubernetes-1.6.html
+在安装教程2中介绍的已经很详细了，一般情况下按照教程安装就可以。
+但有以下两点需要说明以下：</p>
+
+<p>1、节点网络选择。
+关于pod之间网络的选择，我自己选择的是weave，当然是用flannel也可以。说一下我是用weave遇到的问题。目前我使用的k8s 1.6以上版本，所以选择weave网络的时候，也应该选择对应的版本，进行安装。很多网络的教程用的还是k8s 1.5版本，所以切不可照搬。</p>
+
+<figure class="highlight"><pre><code class="language-powershell" data-lang="powershell">1.5版本：  
+kubectl apply -f https://git.io/weave-kube
+1.6版本：  
+kubectl apply -f https://git.io/weave-kube-1.6</code></pre></figure>
+
+<p>选择错误的话，kubedns启动存在问题</p>
+
+<p>2、出现的错误信息。
+正常启动后，kubedns容器中错误提示如下：
+reflector.go:199] k8s.io/dns/vendor/k8s.io/client-go/tools/cache/reflector.go:94: Failed to list *v1.Endpoints: Get https://10.0.0.1:443/api/v1/endpoints?resourceVersion=0: dial tcp 10.0.0.1:443: getsockopt: no route to host</p>
+
+<p>通过查看网友关于此类问题的描述，初步定位于iptables的问题，通过查看iptables可以看到关于网关端口转发被禁，不知道什么原因导致，如果单条记录删除，k8s可自行恢复。初步修复无果。后来听网友推荐，使用清空iptables链，启动正常</p>
+
+<p>解决方案地址：
+https://github.com/kubernetes/kubernetes/issues/44750</p>
+
+<h4>最官方Demo实例安装错误</h4>
+<p>节点加入成功后，运行demo示例提示namespace错误</p>
+
+<figure class="highlight"><pre><code class="language-powershell" data-lang="powershell">运行的命令如下：
+kubectl create namespace sock-shop
+kubectl apply -n sock-shop -f <span class="s2">"https://github.com/microservices-demo/microservices-demo/blob/master/deploy/kubernetes/complete-demo.yaml?raw=true"</span>
+
+修改为：
+kubectl delete namespace sock-shop
+kubectl delete -n sock-shop -f <span class="s2">"https://github.com/microservices-demo/microservices-demo/blob/master/deploy/kubernetes/complete-demo.yaml?raw=true"</span>
+kubectl create -f <span class="s2">"https://github.com/microservices-demo/microservices-demo/blob/master/deploy/kubernetes/complete-demo.yaml?raw=true"</span></code></pre></figure>
+
+<p>有关此问题的解决方案链接
+https://github.com/microservices-demo/microservices-demo/pull/702
+https://github.com/kubernetes/kubernetes.github.io/issues/3214</p>
+
+<h4>安装Heapster 、Influxdb、Garafana</h4>
+<p>参考文章：
+http://www.jianshu.com/p/60069089c981
+需要注意的地方：
+- 重新修改端口映射，可以使用外部ip访问
+- 添加external ip字段，否则无法访问</p>
+
+<p>英文权威指南：
+https://github.com/kubernetes/heapster/blob/master/docs/influxdb.md</p>
+
+<h4>监控部署异常排查</h4>
+<p>Heapster的错误日志如下：
+E0519 07:06:59.731558       1 reflector.go:203] k8s.io/heapster/metrics/processors/namespace_based_enricher.go:84: Failed to list *api.Namespace: the server does not allow access to the requested resource (get namespaces)</p>
+
+<p>E0519 07:07:00.050170       1 reflector.go:203] k8s.io/heapster/metrics/sources/kubelet/kubelet.go:342: Failed to list *api.Node: the server does not allow access to the requested resource (get nodes)</p>
+
+<p>原因定位：初步判断是RABC角色机制导致的这个问题
+错误的解决办法：</p>
+
+<figure class="highlight"><pre><code class="language-powershell" data-lang="powershell">kubectl create clusterrolebinding add-on-cluster-admin <span class="se">\</span>
+    --clusterrole<span class="o">=</span>cluster-admin <span class="se">\</span>
+    --serviceaccount<span class="o">=</span>kube-system:default</code></pre></figure>
+
+<p>关于此问题的英文解决方案说明：
+https://github.com/kubernetes/kubeadm/issues/248</p>
+
+<h4>结束语</h4>
+<p>本篇文章是kubernets容器编排系列的第一篇文章，主要介绍了安装过程中踩的一些坑，以及一些注意事项。每个人在安装过程中可能遇到的问题都不太一样，遇到问题并不可怕，沉下心来，分析错误的原因，总会找到解决方法。</p>
+
+
+
+        </section>
+
+        <footer class="post-footer">
+
+            <!-- Everything inside the #author tags pulls data from the author -->
+            <!-- #author-->
+
+            
+            <figure class="author-image">
+                <a class="img" href="/author/neo" style="background-image: url(/assets/images/cat.jpg)"><span class="hidden">'s Picture</span></a>
+            </figure>
+            
+
+            <section class="author">
+                <h4><a href="/author/neo">Wang Yukun</a></h4>
+                
+                
+                    <p> Looking up to the Starry Sky && Keep both feet firmly on the ground</p>
+                
+                <div class="author-meta">
+                    <span class="author-location icon-location"> Beijing, China</span> 
+                    <span class="author-link icon-link"><a href="http://airfer.github.io/"> airfer.github.io/</a></span> 
+                </div>
+            </section>
+
+            <!-- /author  -->
+
+            <section class="share">
+                <h4>Share this post</h4>
+                <a class="icon-twitter" href="http://twitter.com/share?text=k8s实践日记之安装篇&amp;url=http://airfer.github.io/k8s-practic-install"
+                    onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+                    <span class="hidden">Twitter</span>
+                </a>
+                <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=http://airfer.github.io/k8s-practic-install"
+                    onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+                    <span class="hidden">Facebook</span>
+                </a>
+                <a class="icon-google-plus" href="https://plus.google.com/share?url=http://airfer.github.io/k8s-practic-install"
+                   onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+                    <span class="hidden">Google+</span>
+                </a>
+            </section>
+            
+            <!-- Add Disqus Comments -->
+            
+            
+        </footer>
+
+    </article>
+
+</main>
+
+<aside class="read-next">
+
+    <!-- [[! next_post ]] -->
+    
+        <a class="read-next-story " style="background-image: url(/assets/images/new-pic-17.jpg)" href="/ansible-docker-2">
+            <section class="post">
+                <h2>基于Ansible && Docker的分布式系统(下)</h2>
+                <p>前言：
+在上一篇中，我们主要从Poster入手，然后讲述了为何进行这样的技术选型，分别从docker和ansible两个方面来阐述了原因，本篇的重点在于分析集成于镜像中的Unicorn工程，以及playbook脚本的编写。
+
+一、Un...</p>
+            </section>
+        </a>
+    
+    <!-- [[! /next_post ]] -->
+    <!-- [[! prev_post ]] -->
+    
+        <a class="read-next-story prev " style="background-image: url(/assets/images/new-pic-15.jpg)" href="/ansible-docker-1">
+            <section class="post">
+                <h2>基于Ansible && Docker的分布式系统(上)</h2>
+                <p>从最初的V1.0的分布式用例框架，到现在已经发展到V3.0版本，功能已经越来越完善，执行效率相比第一版也有了质的提升。遇见不同，其实就是见证全新的自己，我相信我们在这条道路上会越走越好。
+
+Poster
+前一段时间，部门内部举办了一场...</p>
+            </section>
+        </a>
+    
+    <!-- [[! /prev_post ]] -->
+</aside>
+
+<!-- /post -->
+
+
+        <footer class="site-footer clearfix">
+          <section class="copyright"><a href="/">Sometimes Things Happen For A Reason</a> &copy; 2019</section>
+          <section class="poweredby">Proudly published with <a href="https://jekyllrb.com/">Jekyll</a> using <a href="https://github.com/biomadeira/jasper">Jasper</a></section>
+        </footer>
+    </div>
+    <!-- [[! Ghost outputs important scripts and data with this tag ]] -->
+    <script type="text/javascript" src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+    <!-- [[! The main JavaScript file for Casper ]] -->
+    <script type="text/javascript" src="/assets/js/jquery.fitvids.js"></script>
+    <script type="text/javascript" src="/assets/js/index.js"></script>
+
+    <!-- Add Google Analytics  -->
+        <!-- Google Analytics Tracking code -->
+     <script>
+	    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+	    ga('create', 'UA-69281367-1', 'auto');
+	    ga('send', 'pageview');
+
+     </script>   
+</body>
+</html>

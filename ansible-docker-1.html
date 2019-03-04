@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!-- [[! Document Settings ]] -->
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+    <!-- [[! Page Meta ]] -->
+    <title>基于Ansible && Docker的分布式系统(上)</title>
+    <meta name="description" content="Sometimes Things Happen For A Reason - There are some things in this world will never change and some things do change,everything that has a beginning has an end " />
+
+    <meta name="HandheldFriendly" content="True" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <link rel="shortcut icon" href="/assets/images/favicon.ico" >
+
+    <!-- [[! Styles'n'Scripts ]] -->
+    <link rel="stylesheet" type="text/css" href="/assets/css/screen.css" />
+    <link rel="stylesheet" type="text/css"
+          href="//fonts.googleapis.com/css?family=Merriweather:300,700,700italic,300italic|Open+Sans:700,400" />
+    <link rel="stylesheet" type="text/css" href="/assets/css/syntax.css" />
+
+    <!-- [[! highlight.js ]] -->
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.3.0/styles/default.min.css">
+    <style>.hljs { background: none; }</style>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.3.0/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+
+    <!-- [[! Ghost outputs important style and meta data with this tag ]] -->
+        <link rel="canonical" href="/" />
+    <meta name="referrer" content="origin" />
+    <link rel="next" href="/page2/" />
+
+    <meta property="og:site_name" content="Sometimes Things Happen For A Reason" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Sometimes Things Happen For A Reason" />
+    <meta property="og:description" content="There are some things in this world will never change and some things do change,everything that has a beginning has an end " />
+    <meta property="og:url" content="/" />
+    <meta property="og:image" content="/assets/images/cover2.jpg" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Sometimes Things Happen For A Reason" />
+    <meta name="twitter:description" content="There are some things in this world will never change and some things do change,everything that has a beginning has an end " />
+    <meta name="twitter:url" content="/" />
+    <meta name="twitter:image:src" content="/assets/images/cover2.jpg" />
+
+    <script type="application/ld+json">
+{
+    "@context": "http://schema.org",
+    "@type": "Website",
+    "publisher": "Finding The Way Home",
+    "url": "/",
+    "image": "/assets/images/cover1.jpg",
+    "description": "There are some things in this world will never change and some things do change,everything that has a beginning has an end "
+}
+    </script>
+
+    <meta name="generator" content="Jekyll 3.0.0" />
+    <link rel="alternate" type="application/rss+xml" title="Sometimes Things Happen For A Reason" href="/feed.xml" />
+
+
+</head>
+<body class="home-template nav-closed">
+
+    <div class="nav">
+    <h3 class="nav-title">Menu</h3>
+    <a href="#" class="nav-close">
+        <span class="hidden">Close</span>
+    </a>
+    <ul>
+        <li class="nav-home " role="presentation"><a href="/">Home</a></li>
+        <li class="nav-summerize " role="presentation"><a href="/tag/summerize">Summerize</a></li>
+        <li class="nav-docker  nav-current" role="presentation"><a href="/tag/docker">Docker&K8s</a></li>
+        <li class="nav-Monitor " role="presentation"><a href="/tag/monitor">Monitor</a></li>
+        <li class="nav-unittest " role="presentation"><a href="/tag/unittest">Unittest</a></li>
+        <li class="nav-pay " role="presentation"><a href="/tag/pay">Pay</a></li>
+    </ul>
+    <a class="subscribe-button icon-feed" href="/feed.xml">Subscribe</a>
+</div>
+<span class="nav-cover"></span>
+
+
+    <div class="site-wrapper">
+
+        <!-- [[! Everything else gets inserted here ]] -->
+        <!-- < default -->
+
+<!-- The comment above "< default" means - insert everything in this file into -->
+    <!-- the [body] of the default.hbs template, which contains our header/footer. -->
+
+<!-- Everything inside the #post tags pulls data from the post -->
+<!-- #post -->
+
+<header class="main-header post-head " style="background-image: url(/assets/images/new-pic-15.jpg) ">
+    <nav class="main-nav  overlay  clearfix">
+        <a class="blog-logo" href="/"><img src="/assets/images/ghost.png" alt="Blog Logo" /></a>
+        
+            <a class="menu-button icon-menu" href="#"><span class="word">Menu</span></a>
+        
+    </nav>
+</header>
+
+<main class="content" role="main">
+
+    <article class="post tag-test tag-content">
+
+        <header class="post-header">
+            <h1 class="post-title">基于Ansible && Docker的分布式系统(上)</h1>
+            <section class="post-meta">
+            <!-- <a href='/'>Wang Yukun</a> -->
+            <time class="post-date" datetime="2017-03-25">25 Mar 2017</time>
+                <!-- [[tags prefix=" on "]] -->
+                 
+                on 
+                
+                    
+                       <a href='/tag/docker'>Docker</a>
+                       
+                
+                
+            </section>
+        </header>
+
+        <section class="post-content">
+            
+            <p>从最初的V1.0的分布式用例框架，到现在已经发展到V3.0版本，功能已经越来越完善，执行效率相比第一版也有了质的提升。遇见不同，其实就是见证全新的自己，我相信我们在这条道路上会越走越好。</p>
+
+<h4>Poster</h4>
+<p>前一段时间，部门内部举办了一场技术开放日活动，我和组内的宋大神，做了关于第三版通用分布式用例框架的Poster，一些同学对我们所做的很敢兴趣，当时因为时间有限，并且人又很多，许多地方讲述的也不太完善。趁着五一之前的少许空闲，把Poster的内容稍微梳理一下，算是我个人对这段时间的一个总结，对可能感兴趣的同学也会有一些帮助。</p>
+
+<p>poster的内容如下图所示：
+<img src="/images/pc_ads_distribution/ansible_docker_framework.jpg" alt="" /></p>
+
+<h4>我们的痛点和目标</h4>
+
+<p>Poster中列出了V1.0版本，和V2.0版本的痛点，这里简要的说一下。运行时间长，以及分布式节点扩展困难，以及case的粒度无法控制，主要对V1.0来说的。关于详细的一些情况，可以查看之前发的文章。</p>
+
+<p>需要人工选择部署的主机，这个是V2.0版本的遇到的，我们设想的流程是提交任务后，框架自主的从主机列表中选择合适的主机，然后去执行任务，这在V3.0版本已经解决了，虽然方法有些简单，但是也算初步解决了问题，后续在进行完善。</p>
+
+<p>我们的目标其实就是打造通用型、高效的用例执行框架，把其作为服务提供给开发人员和测试人员。V2.0版本虽然初步完成了这个目标，但是由于其和业务联系紧密，扩展性较差，这也是开发V3.0版本的一个原因。</p>
+
+<h4>优势在哪？</h4>
+
+<p>V3.0版本的分布式用例执行框架，优势主要体现在三个方面：</p>
+
+<ul>
+  <li>
+    <p>更简单：
+每一个服务Server，都会有自己独立的一份配置。配置之间的修改也互不影响，初次之外，配置的填写和管理，全部集成在部门内部的测试平台中，只要有相对于的修改权限，都可以修改配置，执行任务。整个过程简单明了</p>
+  </li>
+  <li>
+    <p>更智能：
+更智能则体现在主机的分布式节点部署上，通过自有的算法动态的选择主机，然后自主部署，省去了人工选择Host的麻烦，可以做到比人本身更出色的分配，调度能力。目前在分布式节点部署调度上，所试用的规则有三条：
+a. 在Host主机中资源满足条件的情况下，优先在已经部署过分布式节点的host上执行部署任务
+b. 如果是初次部署任务，优先在资源剩余量最大的Host上部署任务
+c. 针对所部署的节点数目以及host资源，完美拆分后部署（目前还不支持）</p>
+  </li>
+</ul>
+
+<p>对于规则a的规定，其实是和业务紧密联系的。由于我们容器需要加载的文件太大，所以拖取需要加载的文件需要花费大量的时间，所以在host主机资源允许的情况下，尽量在已经部署过节点的主机上部署</p>
+
+<p>和一般分布式框架不同，本分布式用例框架采用异步抢占式的调度策略，关于该抢占策略的实现，主要是借助Celery来完成的。在之前介绍V2.0版本的时候已经做了阐述，这里不细说了。</p>
+
+<ul>
+  <li>更高效：
+更高效体现在一台主机，可以同时运行多个服务实例，相比于V1.0版本，case的执行效率可以成倍提升。V2.0版本已经实现了这一方法，在V3.0版本中继承了V2.0版本中优势的地方。</li>
+</ul>
+
+<h4>Why Ansible ?</h4>
+
+<p>Ansible的好处在poster中已经列出来了，之前我对ansible也不熟悉，但是用过之后发现真的非常方便。由于是Agentless框架，所以无需在被操控的主机上安装客户端。</p>
+
+<p>现在我们做到一套服务，一份配置，说的更明白一点，这份配置就是ansible的 playbook脚本，而动态主机信息的获取也主要是通过Ansible的动态Inventory来实现的。配置信息填写界面如下图所示：</p>
+
+<p>这一点和V2.0版本有显著的不同，在V2.0版本中，任务资源获取、加载、执行，完全是整合在一起。没有使用Ansible来进行任务信息，主机资源信息的收集和管理，这也导致了业务和框架的耦合度太高，迁移到其他业务的成本太大，也是做V3.0的根本原因</p>
+
+<p>在技术分享日的当天，有很多的同学问我，为啥选择ansible而不选择SaltStack等工具呢？其实我没有使用过SaltStack，在网上看到对比说，SaltStack的执行效率要比Ansible高，但是由于我们是测试环境下部署，对于执行效率并没有太高的要求；再者部门内宋大神使用Ansible已经很长时间了，现有的很多服务部署执行，都是基于Ansible来做的，所以在执行工具的选择上就选择了Ansible。除此之外，ansible对docker支持良好，这也是一个非常重要的原因。</p>
+
+<p>所以，是不是选择Ansible还是要具体情况具体分析。</p>
+
+<h4>Why Docker ?</h4>
+
+<p>选择docker的原因，在前几篇的文章中已经分析过了。poster中简单的列了几条，之前由于只在PC业务中使用docker，所以维护一份镜像就够了。现在为了适应不同的业务线，我们做到了一份服务（一个server），一份镜像，根据业务需求进行定制。将构建好的镜像推送的私有的Docker Registry中，需要部署任务的时候从中拉取，方便管理且高效</p>
+
+<p>每一次运行任务，都会重新启用新的容器，由于容器之间不需要相互通信，所以全部都使用bridge模式，运行一次构建一次，运行结束后就删除容器，释放计算机资源，这样真正的做到了任务之间的互相不影响。</p>
+
+<p>只要计算机资源允许，可以在同一主机上运行多个服务实例，这相当于将一台主机当几台来用，不但提高了执行效率，还充分利用了现有的计算机资源。</p>
+
+<p>关于docker在分布式用例系统中的具体应用，如果感兴趣，可以阅读以下之前发的相关文章，关于docker就说到这吧</p>
+
+<h4>后记</h4>
+
+<p>V3.0版本已经解决了很多问题，但是仍有很多问题没有解决，poster中也列出了2点。这都在后续完善的范畴之内。在分享日的当天，有些同学问了我这样一个问题，如果容器之间需要相互通信该怎么办呢？其实在此之前我都没有仔细考虑过这个问题，由于我们的部署在容器中的服务，不需要在容器之间相互通信，其所依赖的其他服务全部都是Mock桩并集成在单个容器中。所以对于容器之间相互通信的解决方案，我想了几个，可能不是很完善，发出来，全当同学们之间交流了</p>
+
+<ul>
+  <li>像目前我所做的，如果其依赖的都是Mock桩，那么可以将其集成在单个容器中，这样就绕过了容器之间通信的问题</li>
+  <li>如果所依赖的都是真实的服务，如果自己实现容器的调度，可以通过host模式以及端口映射来解决，但是其访问的规则也要在配置文件中写清楚防止混乱</li>
+  <li>如果系统是centos7等高版本系统，可以使用一些容器编排工具，包括新版的swarm或者k8s，我自己没有使用编排工具进行过分布式用例系统设计，所以更多的建议我也无法给出了</li>
+</ul>
+
+<p>其实本篇只是梳理了一下poster的内容，对一些内容作了进一步阐释，在下篇中会讲述playbook脚本文件实现，以及集成于镜像文件中的unicorn（独角兽）工程。测试，遇见不同，遇见不同的自己。</p>
+
+<p>最后欢迎关注我们的微信公众号”铸盾师”</p>
+
+
+
+        </section>
+
+        <footer class="post-footer">
+
+            <!-- Everything inside the #author tags pulls data from the author -->
+            <!-- #author-->
+
+            
+            <figure class="author-image">
+                <a class="img" href="/author/neo" style="background-image: url(/assets/images/cat.jpg)"><span class="hidden">'s Picture</span></a>
+            </figure>
+            
+
+            <section class="author">
+                <h4><a href="/author/neo">Wang Yukun</a></h4>
+                
+                
+                    <p> Looking up to the Starry Sky && Keep both feet firmly on the ground</p>
+                
+                <div class="author-meta">
+                    <span class="author-location icon-location"> Beijing, China</span> 
+                    <span class="author-link icon-link"><a href="http://airfer.github.io/"> airfer.github.io/</a></span> 
+                </div>
+            </section>
+
+            <!-- /author  -->
+
+            <section class="share">
+                <h4>Share this post</h4>
+                <a class="icon-twitter" href="http://twitter.com/share?text=基于Ansible && Docker的分布式系统(上)&amp;url=http://airfer.github.io/ansible-docker-1"
+                    onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+                    <span class="hidden">Twitter</span>
+                </a>
+                <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=http://airfer.github.io/ansible-docker-1"
+                    onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+                    <span class="hidden">Facebook</span>
+                </a>
+                <a class="icon-google-plus" href="https://plus.google.com/share?url=http://airfer.github.io/ansible-docker-1"
+                   onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+                    <span class="hidden">Google+</span>
+                </a>
+            </section>
+            
+            <!-- Add Disqus Comments -->
+            
+            
+        </footer>
+
+    </article>
+
+</main>
+
+<aside class="read-next">
+
+    <!-- [[! next_post ]] -->
+    
+        <a class="read-next-story " style="background-image: url(/assets/images/new-pic-16.jpg)" href="/k8s-practic-install">
+            <section class="post">
+                <h2>k8s实践日记之安装篇</h2>
+                <p>其实很早就想深入了解一下容器编排工具，但是由于各种各样的事情，被耽搁了很久。最近就抽时间认真学习了一下kubernets（K8S）,虽然对其原理还未深入的了解，但是从初步掌握的情况来看，真的是一个非常牛的框架，本系列就先从安装篇开始（...</p>
+            </section>
+        </a>
+    
+    <!-- [[! /next_post ]] -->
+    <!-- [[! prev_post ]] -->
+    
+        <a class="read-next-story prev " style="background-image: url(/assets/images/new-pic-14.jpg)" href="/summerize-for-server-test">
+            <section class="post">
+                <h2>服务端功能测试小记</h2>
+                <p>前言
+过年回来之后，业务的功能测试渐渐多了起来，我之前一直负责的是PC方面的测试，而现在除了负责PC的业务测试之外，还负责无线业务的测试。骤然间自己所有的时间差不多都被功能测试任务占据了，到2月份末的时候，关于测试任务的排期都排到了4...</p>
+            </section>
+        </a>
+    
+    <!-- [[! /prev_post ]] -->
+</aside>
+
+<!-- /post -->
+
+
+        <footer class="site-footer clearfix">
+          <section class="copyright"><a href="/">Sometimes Things Happen For A Reason</a> &copy; 2019</section>
+          <section class="poweredby">Proudly published with <a href="https://jekyllrb.com/">Jekyll</a> using <a href="https://github.com/biomadeira/jasper">Jasper</a></section>
+        </footer>
+    </div>
+    <!-- [[! Ghost outputs important scripts and data with this tag ]] -->
+    <script type="text/javascript" src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+    <!-- [[! The main JavaScript file for Casper ]] -->
+    <script type="text/javascript" src="/assets/js/jquery.fitvids.js"></script>
+    <script type="text/javascript" src="/assets/js/index.js"></script>
+
+    <!-- Add Google Analytics  -->
+        <!-- Google Analytics Tracking code -->
+     <script>
+	    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+	    ga('create', 'UA-69281367-1', 'auto');
+	    ga('send', 'pageview');
+
+     </script>   
+</body>
+</html>

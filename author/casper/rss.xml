@@ -13,10 +13,10 @@
    
 	<item>
 	  <title>codeDiff实施规范V1.0草案</title>
-	  <link>//codediff2019</link>
+	  <link>//Codediff2019</link>
 	  <author>Wang Yukun</author>
 	  <pubDate>2019-03-04T16:28:00+00:00</pubDate>
-	  <guid>//codediff2019</guid>
+	  <guid>//Codediff2019</guid>
 	  <description><![CDATA[
 	     <p>
     Code Review作为质量保障的重要一环，在很长时间内没有引起足够的重视，在趟过了很多坑后发现，有很多的错误在Code Diff阶段能够很好的避免。

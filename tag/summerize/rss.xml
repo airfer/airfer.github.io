@@ -12,6 +12,27 @@
    <atom:link href="rss" rel="self" type="application/rss+xml" />
    
 	<item>
+	  <title>codeDiff实施规范V1.0草案</title>
+	  <link>//codediff2019</link>
+	  <author>Wang Yukun</author>
+	  <pubDate>2019-03-04T16:28:00+00:00</pubDate>
+	  <guid>//codediff2019</guid>
+	  <description><![CDATA[
+	     <p>
+    Code Review作为质量保障的重要一环，在很长时间内没有引起足够的重视，在趟过了很多坑后发现，有很多的错误在Code Diff阶段能够很好的避免。
+    文中总结了Code Review过程中曾遇到的问题，并形成规范，希望尽可能在Review阶段发现尽可能多的bug，做好质量保障！
+</p>
+<p><img src="/images/mt/codediff/codediff-01.png" alt="" />
+<img src="/images/mt/codediff/codediff-02.png" alt="" />
+<img src="/images/mt/codediff/codediff-03.png" alt="" />
+<img src="/images/mt/codediff/codediff-04.png" alt="" />
+<img src="/images/mt/codediff/codediff-05.png" alt="" /></p>
+
+
+	  ]]></description>
+	</item>
+
+	<item>
 	  <title>2017-2018年度测试总结</title>
 	  <link>//summerize2018</link>
 	  <author>Wang Yukun</author>

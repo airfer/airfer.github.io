@@ -6,7 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 
     <!-- [[! Page Meta ]] -->
-    <title>2017-2018年度测试总结</title>
+    <title>codeDiff实施规范V1.0草案</title>
     <meta name="description" content="Sometimes Things Happen For A Reason - There are some things in this world will never change and some things do change,everything that has a beginning has an end " />
 
     <meta name="HandheldFriendly" content="True" />
@@ -91,7 +91,7 @@
 <!-- Everything inside the #post tags pulls data from the post -->
 <!-- #post -->
 
-<header class="main-header post-head " style="background-image: url(/assets/images/new_pic20.jpg) ">
+<header class="main-header post-head " style="background-image: url(/assets/images/new_pic21.jpg) ">
     <nav class="main-nav  overlay  clearfix">
         <a class="blog-logo" href="/"><img src="/assets/images/ghost.png" alt="Blog Logo" /></a>
         
@@ -105,10 +105,10 @@
     <article class="post tag-test tag-content">
 
         <header class="post-header">
-            <h1 class="post-title">2017-2018年度测试总结</h1>
+            <h1 class="post-title">codeDiff实施规范V1.0草案</h1>
             <section class="post-meta">
             <!-- <a href='/'>Wang Yukun</a> -->
-            <time class="post-date" datetime="2018-02-20">20 Feb 2018</time>
+            <time class="post-date" datetime="2019-03-04">04 Mar 2019</time>
                 <!-- [[tags prefix=" on "]] -->
                  
                 on 
@@ -124,55 +124,14 @@
         <section class="post-content">
             
             <p>
-    2017-2018年算是成长比较快的一年，在业务测试、流程推进、自动化测试、持续集成、平台开发、规范制定等方面都有了一些别样的收获。
-    2018年已经远去，记录一下2017-2018年的自己，既往不恋，纵情向前！
+    Code Review作为质量保障的重要一环，在很长时间内没有引起足够的重视，在趟过了很多坑后发现，有很多的错误在Code Diff阶段能够很好的避免。
+    文中总结了Code Review过程中曾遇到的问题，并形成规范，希望尽可能在Review阶段发现尽可能多的bug，做好质量保障！
 </p>
-
-<p><img src="/images/mt/summerize/summerize_mt.002.jpeg" alt="" />
-<img src="/images/mt/summerize/summerize_mt.003.jpeg" alt="" />
-<img src="/images/mt/summerize/summerize_mt.004.jpeg" alt="" /></p>
-
-<p><img src="/images/mt/summerize/summerize_mt.005.jpeg" alt="" /></p>
-
-<p><img src="/images/mt/summerize/summerize_mt.006.jpeg" alt="" /></p>
-
-<p><img src="/images/mt/summerize/summerize_mt.007.jpeg" alt="" /></p>
-
-<p><img src="/images/mt/summerize/summerize_mt.008.jpeg" alt="" />
-<img src="/images/mt/summerize/summerize_mt.009.jpeg" alt="" /></p>
-
-<p><img src="/images/mt/summerize/summerize_mt.0010.jpeg" alt="" /></p>
-
-<p><img src="/images/mt/summerize/summerize_mt.011.jpeg" alt="" /></p>
-
-<p><img src="/images/mt/summerize/summerize_mt.012.jpeg" alt="" />
-<img src="/images/mt/summerize/summerize_mt.013.jpeg" alt="" /></p>
-
-<p><img src="/images/mt/summerize/summerize_mt.014.jpeg" alt="" />
-<img src="/images/mt/summerize/summerize_mt.015.jpeg" alt="" />
-<img src="/images/mt/summerize/summerize_mt.016.jpeg" alt="" />
-<img src="/images/mt/summerize/summerize_mt.017.jpeg" alt="" />
-<img src="/images/mt/summerize/summerize_mt.018.jpeg" alt="" />
-<img src="/images/mt/summerize/summerize_mt.019.jpeg" alt="" />
-<img src="/images/mt/summerize/summerize_mt.020.jpeg" alt="" />
-<img src="/images/mt/summerize/summerize_mt.021.jpeg" alt="" />
-<img src="/images/mt/summerize/summerize_mt.022.jpeg" alt="" />
-<img src="/images/mt/summerize/summerize_mt.023.jpeg" alt="" /></p>
-
-<p><img src="/images/mt/summerize/summerize_mt.024.jpeg" alt="" />
-<img src="/images/mt/summerize/summerize_mt.025.jpeg" alt="" />
-<img src="/images/mt/summerize/summerize_mt.026.jpeg" alt="" />
-<img src="/images/mt/summerize/summerize_mt.027.jpeg" alt="" />
-<img src="/images/mt/summerize/summerize_mt.027.jpeg" alt="" />
-<img src="/images/mt/summerize/summerize_mt.029.jpeg" alt="" />
-<img src="/images/mt/summerize/summerize_mt.030.jpeg" alt="" /></p>
-
-<p><img src="/images/mt/summerize/summerize_mt.031.jpeg" alt="" />
-<img src="/images/mt/summerize/summerize_mt.032.jpeg" alt="" />
-<img src="/images/mt/summerize/summerize_mt.033.jpeg" alt="" />
-<img src="/images/mt/summerize/summerize_mt.034.jpeg" alt="" /></p>
-
-<p><img src="/images/mt/summerize/summerize_mt.035.jpeg" alt="" /></p>
+<p><img src="/images/mt/codediff/codediff-01.png" alt="" />
+<img src="/images/mt/codediff/codediff-02.png" alt="" />
+<img src="/images/mt/codediff/codediff-03.png" alt="" />
+<img src="/images/mt/codediff/codediff-04.png" alt="" />
+<img src="/images/mt/codediff/codediff-05.png" alt="" /></p>
 
 
 
@@ -205,15 +164,15 @@
 
             <section class="share">
                 <h4>Share this post</h4>
-                <a class="icon-twitter" href="http://twitter.com/share?text=2017-2018年度测试总结&amp;url=http://airfer.github.io/summerize2018"
+                <a class="icon-twitter" href="http://twitter.com/share?text=codeDiff实施规范V1.0草案&amp;url=http://airfer.github.io/codediff2019"
                     onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
                     <span class="hidden">Twitter</span>
                 </a>
-                <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=http://airfer.github.io/summerize2018"
+                <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=http://airfer.github.io/codediff2019"
                     onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
                     <span class="hidden">Facebook</span>
                 </a>
-                <a class="icon-google-plus" href="https://plus.google.com/share?url=http://airfer.github.io/summerize2018"
+                <a class="icon-google-plus" href="https://plus.google.com/share?url=http://airfer.github.io/codediff2019"
                    onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
                     <span class="hidden">Google+</span>
                 </a>
@@ -232,25 +191,18 @@
 
     <!-- [[! next_post ]] -->
     
-        <a class="read-next-story " style="background-image: url(/assets/images/new_pic21.jpg)" href="/codediff2019">
-            <section class="post">
-                <h2>codeDiff实施规范V1.0草案</h2>
-                <p>
-    Code Review作为质量保障的重要一环，在很长时间内没有引起足够的重视，在趟过了很多坑后发现，有很多的错误在Code Diff阶段能够很好的避免。
-    文中总结了Code Review过程中曾遇到的问题，并形成规范...</p>
-            </section>
-        </a>
-    
     <!-- [[! /next_post ]] -->
     <!-- [[! prev_post ]] -->
     
-        <a class="read-next-story prev " style="background-image: url(/assets/images/new-pic-18.jpg)" href="/k8s-practice">
+        <a class="read-next-story prev " style="background-image: url(/assets/images/new_pic20.jpg)" href="/summerize2018">
             <section class="post">
-                <h2>kubernetes在测试中的应用实践</h2>
-                <p>前言
-在休假之前就想写一写kubernetes在测试中应用的一些事，后来因为各种原因被耽搁了下来。这次趁着休假期间的空闲，把应用方面的东西梳理一下，算做是对之前一段研究东西的总结。
+                <h2>2017-2018年度测试总结</h2>
+                <p>
+    2017-2018年算是成长比较快的一年，在业务测试、流程推进、自动化测试、持续集成、平台开发、规范制定等方面都有了一些别样的收获。
+    2018年已经远去，记录一下2017-2018年的自己，既往不恋，纵情向前！
 
-研究kubernetes也有一段时间了，在测试方面...</p>
+
+...</p>
             </section>
         </a>
     

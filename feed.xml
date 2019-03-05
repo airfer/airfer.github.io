@@ -8,7 +8,7 @@
     
       
       <item>
-        <title>codeDiff实施规范V1.0草案</title>
+        <title>Code Review实施规范V1.0草案</title>
         
           <description>&lt;p&gt;
     Code Review作为质量保障的重要一环，在很长时间内没有引起足够的重视，在趟过了很多坑后发现，有很多的错误在Code Diff阶段能够很好的避免。

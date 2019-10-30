@@ -18,9 +18,7 @@
 	  <pubDate>2019-09-10T19:28:00+00:00</pubDate>
 	  <guid>//opensource-rattler</guid>
 	  <description><![CDATA[
-	     <p><a href="LICENSE"><img src="https://img.shields.io/badge/License-GPL%203.0-red.svg" alt="License" /></a> <a href="https://travis-ci.com/airfer/rattler"><img src="https://api.travis-ci.com/airfer/rattler.svg?branch=master" alt="Build Status" /></a> <a href="https://github.com/airfer/rattler/issues"><img src="https://img.shields.io/github/issues/airfer/rattler.svg" alt="GitHub issues" /></a> <a href="https://codecov.io/gh/airfer/rattler"><img src="https://codecov.io/gh/airfer/rattler/branch/master/graph/badge.svg" alt="codecov" /></a></p>
-
-<h2 id="section">项目简介</h2>
+	     <h2 id="section">项目简介</h2>
 
 <p>每个服务都有属于自身的核心特性。我们将服务的核心特性进行抽象，并使用核心链路这个概念来具象化核心特性。说的更直白一些，核心链路覆盖了核心服务绝大部分功能(超过80%)，例如某服务为交易服务，那么下单链路、付款链路、退单链路、退款链路都属于核心链路。</p>
 
@@ -98,14 +96,15 @@
 
 <p>在使用之前需要事先通过pom引入jar文件，可以使用本开源的jar包，也可以自行编译上传到私有maven仓库，示例：</p>
 
-<pre><code class="xml">
+<pre><code class="text">
 <dependency>
     <groupid>com.github.airfer</groupid>
     <artifactid>rattler</artifactid>
     <version>1.0.0-SNAPSHOT</version>
 </dependency>
 </code></pre>
-<p>### 注解引入</p>
+
+<h3 id="section-4">注解引入</h3>
 
 <p>注解引入，有两种引入方式。可以通过CoreChainClass注解和CoreChainMethod注解引入。由于目前是侵入式收集，会直接修改代码，所以最好和RD一起来做这个事情。
 由于链路收集的收集采用静态扫描方式，所以理论上不会对注入服务造成性能影响。为了避免对线上服务造成潜在影响，可以在线上环境可以关闭链路信息收集以及信息上送服务，如何关闭请参见配置说明部分。</p>
@@ -160,7 +159,7 @@ public class Application {
 }
 </code></pre>
 
-<h2 id="section-4">配置文件使用</h2>
+<h2 id="section-5">配置文件使用</h2>
 
 <p>服务引入jar包，并添加链路注解后，需要添加rattler配置文件。添加方式为在resource目录下新增rattler.properties文件，内容示例如下：</p>
 <pre><code class="text">
@@ -190,20 +189,20 @@ git diff feature/* master &gt;result.patch
 </code></pre>
 <p>获取patch文件后，解析patch文件，获取变动的函数列表，并将函数列表信息上送到指定服务器，目前仅支持Http协议</p>
 
-<h3 id="section-5">主要用途</h3>
+<h3 id="section-6">主要用途</h3>
 <ul>
   <li>基于git patch文件分析函数变动，进行服务核心链路冲撞率(collision rate)计算，评估影响面大小</li>
   <li>统计核心链路的变更频率，为服务的重构以及优化提供数据支持</li>
 </ul>
 
-<h3 id="section-6">安装方法</h3>
+<h3 id="section-7">安装方法</h3>
 
 <ol>
   <li>下载源代码，使用python setup.py install进行安装</li>
   <li>使用rattler-func-detection 命令运行,可通过 –help命令查看可选项</li>
 </ol>
 
-<h3 id="section-7">命令行信息详解</h3>
+<h3 id="section-8">命令行信息详解</h3>
 <pre><code class="text">
 Usage: rattler-func-detection [OPTIONS]
 
@@ -217,12 +216,12 @@ Options:
   --help             Show this message and exit.
 </code></pre>
 
-<h2 id="section-8">链路碰撞分析</h2>
+<h2 id="section-9">链路碰撞分析</h2>
 
 <p>假设我们现在有两个核心链路A和A1(<strong><em>单个服务内部函数之间的链路调用关系，非微服务之间的调用，A-G、A1-G1皆为函数</em></strong>),两条链路中的所有调用函数都可通过CoreChain类注解进行收集。而需求迭代所造成的代码变动可通过rattler-func-detection进行收集，链路碰撞示意图如下所示：
 <img src="https://airfer.github.io/images/rattler/func-detection.jpg" alt="detect" /></p>
 
-<h2 id="section-9">结果预览</h2>
+<h2 id="section-10">结果预览</h2>
 <p>拿到链路数据之后，就可以计算每条链路中有多少函数处于被影响的范围。虽然在进行链路信息标注时设置了权重值，但是目前权重值还没有被应用于计算，预计下期项目提供支持</p>
 <pre><code class="text">
 {
@@ -235,14 +234,14 @@ Options:
 }
 </code></pre>
 
-<h2 id="section-10">使用限制</h2>
+<h2 id="section-11">使用限制</h2>
 
 <ul>
   <li>rattler基于JDK8开发，使用了很多新特性，比如stream，对于基于低于JDK8的服务版本暂不支持</li>
   <li>目前rattler仅适用于JAVA后端服务，对于非JAVA服务以及前端暂不支持</li>
 </ul>
 
-<h2 id="section-11">排期计划</h2>
+<h2 id="section-12">排期计划</h2>
 
 <ul>
   <li>方法权重值纳入链路冲撞分析范围 预计2019/11</li>

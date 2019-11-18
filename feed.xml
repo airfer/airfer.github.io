@@ -23,48 +23,6 @@
     
       
       <item>
-        <title>Code Review实施规范V2.0</title>
-        
-          <description>&lt;p&gt;
-    Code Review作为质量保障的重要一环，在很长时间内没有引起足够的重视，在趟过了很多坑后发现，有很多的错误在Code Diff阶段能够很好的避免。
-    文中总结了Code Review过程中曾遇到的问题，并形成规范，尽可能在Review阶段发现尽可能多的bug，做好质量保障！
-&lt;/p&gt;
-&lt;embed src=&quot;/pdfs/codeDiff.pdf&quot; type=&quot;application/pdf&quot; /&gt;
-
-</description>
-        
-        <pubDate>Thu, 04 Apr 2019 16:28:00 +0000</pubDate>
-        <link>
-        http://airfer.github.io//codeDiff2.0</link>
-        <guid isPermaLink="true">http://airfer.github.io//codeDiff2.0</guid>
-      </item>
-      
-    
-      
-      <item>
-        <title>Code Review实施规范V1.0草案</title>
-        
-          <description>&lt;p&gt;
-    Code Review作为质量保障的重要一环，在很长时间内没有引起足够的重视，在趟过了很多坑后发现，有很多的错误在Code Diff阶段能够很好的避免。
-    文中总结了Code Review过程中曾遇到的问题，并形成规范，尽可能在Review阶段发现尽可能多的bug，做好质量保障！
-&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;/images/mt/codediff/codediff-1.png&quot; alt=&quot;&quot; /&gt;
-&lt;img src=&quot;/images/mt/codediff/codediff-2.png&quot; alt=&quot;&quot; /&gt;
-&lt;img src=&quot;/images/mt/codediff/codediff-3.png&quot; alt=&quot;&quot; /&gt;
-&lt;img src=&quot;/images/mt/codediff/codediff-4.png&quot; alt=&quot;&quot; /&gt;
-&lt;img src=&quot;/images/mt/codediff/codediff-5.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
-
-</description>
-        
-        <pubDate>Mon, 04 Mar 2019 16:28:00 +0000</pubDate>
-        <link>
-        http://airfer.github.io//Codediff2019</link>
-        <guid isPermaLink="true">http://airfer.github.io//Codediff2019</guid>
-      </item>
-      
-    
-      
-      <item>
         <title>2017-2018年度测试总结</title>
         
           <description>&lt;p&gt;

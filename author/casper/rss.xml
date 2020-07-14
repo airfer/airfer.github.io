@@ -96,13 +96,11 @@
 
 <p>在使用之前需要事先通过pom引入jar文件，可以使用本开源的jar包，也可以自行编译上传到私有maven仓库，示例：</p>
 
-<pre><code class="text">
 <dependency>
     <groupid>com.github.airfer</groupid>
     <artifactid>rattler</artifactid>
     <version>1.0.0-SNAPSHOT</version>
 </dependency>
-</code></pre>
 
 <h3 id="section-4">注解引入</h3>
 
